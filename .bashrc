@@ -1,6 +1,8 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+~/.bash_private
+
 # Environment variables
 export PS1="┣━ " # Set Bash prompt
 export BUN_INSTALL="$HOME/.bun" # Set Bun install location

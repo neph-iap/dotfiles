@@ -9,6 +9,7 @@
 .config/*
 !.config/picom/
 !.config/nvim/
+.config/nvim/lazy-lock.json
 !.config/joshuto/
 !.config/wezterm/
 !.config/awesome/

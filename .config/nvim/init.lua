@@ -30,7 +30,7 @@ vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "markdown", "text" },
 	callback = function()
 		vim.opt_local.wrap = true
-		vim.opt.linebreak = true
+		vim.opt_local.linebreak = true
 	end,
 })
 
@@ -42,7 +42,7 @@ vim.api.nvim_create_autocmd("BufRead", {
 	end,
 })
 
--- Detect rasi files
+-- Detect Rasi files
 vim.api.nvim_create_autocmd("BufRead", {
 	pattern = "*.rasi",
 	callback = function()
@@ -124,7 +124,10 @@ require("lazy").setup(
 								added = "+",
 								modified = "M",
 								untracked = "U",
+								deleted = "󰩹",
+								renamed = "R",
 								staged = "S",
+								unstaged = "",
 								conflict = "",
 								ignored = "󰈉",
 							},
@@ -227,6 +230,7 @@ require("lazy").setup(
 										Toml = "TOML",
 										Typescriptreact = "TypeScript + Syntax Extension",
 										Javascriptreact = "JavaScript + Syntax Extension",
+										Gitignore = "Git Ignore",
 									}
 
 									if special_formats[formatted] then
@@ -238,7 +242,7 @@ require("lazy").setup(
 							},
 						},
 
-						-- Set the "C" section to be the Git branch name
+						-- Set the "C" section to be the Git branch name for rehabilitatoin
 						lualine_c = {
 							"branch",
 						},

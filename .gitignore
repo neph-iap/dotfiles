@@ -1,0 +1,15 @@
+/*
+
+!.bashrc
+!.gitignore
+!README.md
+!.docs
+
+!.config
+.config/*
+!.config/picom/
+!.config/nvim/
+!.config/joshuto/
+!.config/wezterm/
+!.config/awesome/
+!.config/neofetch/

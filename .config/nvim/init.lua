@@ -126,7 +126,7 @@ require("lazy").setup(
 								untracked = "U",
 								deleted = "󰩹",
 								renamed = "R",
-								staged = "S",
+								staged = "",
 								unstaged = "",
 								conflict = "",
 								ignored = "󰈉",

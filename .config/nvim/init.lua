@@ -676,6 +676,8 @@ vim.keymap.set("n", "<leader>eu", ":wincmd p<CR>", { silent = true }) -- Unfocus
 vim.keymap.set("n", "<leader>nc", ":NoiceDismiss<CR>", { silent = true }) -- Dismiss notifications
 vim.keymap.set("v", "<space>y", '"+y', {}) -- Copy to system clipboard
 vim.keymap.set("n", "<space>p", '"+p', {}) -- Paste to system clipboard
+vim.keymap.set("n", "j", "gj", {}) -- Move down by visual line
+vim.keymap.set("n", "k", "gk", {}) -- Move up by visual line
 
 -- Lsp Mappings
 vim.keymap.set("n", "<leader>fr", ":Forge<CR>", { silent = true }) -- Open Forge.nvim

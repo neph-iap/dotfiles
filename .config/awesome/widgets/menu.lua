@@ -119,6 +119,7 @@ function public.setup(widgets)
 			"Wednesday",
 			"Thursday",
 			"Friday",
+			"Saturday",
 		}
 
 		local today_day = days[today.wday]

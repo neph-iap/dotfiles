@@ -1,19 +1,31 @@
 /*
 
+# General
 !.bashrc
 !.gitignore
+!.install.sh
+
+# Documentation
 !README.md
 !.docs
-!.install.sh
 
 !.config
 .config/*
 !.config/picom/
+
+# Neovim
 !.config/nvim/
 .config/nvim/lazy-lock.json
+
+# Configuration
 !.config/joshuto/
 !.config/wezterm/
 !.config/awesome/
 !.config/neofetch/
 !.config/stylua/
 !.config/lush/
+
+# OneDrive
+!.config/onedrive
+.config/onedrive/*
+!.config/onedrive/config

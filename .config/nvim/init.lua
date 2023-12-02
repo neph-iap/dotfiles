@@ -6,7 +6,7 @@
 
 Neph Iapalucci's init.lua configuration for Neovim.
 
-]]
+--]]
 
 -- =======================================================================================================================================================================================================
 -- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options -
@@ -85,6 +85,7 @@ require("lazy").setup(
 				"nvim-lua/plenary.nvim",
 				"nvim-tree/nvim-web-devicons",
 				"MunifTanjim/nui.nvim",
+				"3rd/image.nvim",
 			},
 			config = function()
 				require("nvim-web-devicons").setup({
@@ -251,13 +252,13 @@ require("lazy").setup(
 						lualine_y = {
 							{
 								"filename",
-								fmt = function(name)
+								fmt = function()
 									local path = vim.fn.expand("%:p")
 									local cwd = vim.fn.getcwd()
 									if path:sub(1, cwd:len()) == cwd then
 										path = path:sub(cwd:len() + 2, path:len())
 									end
-									if path == os.getenv("HOME") .. "/.config/nvim/init.lua" then
+									if path == ".config/nvim/init.lua" then
 										path = " Neovim Config"
 									end
 									return path
@@ -618,7 +619,7 @@ require("lazy").setup(
 					suggestion = {
 						auto_trigger = true,
 						keymap = {
-							accept = "<M-`>",
+							accept = "<Tab>",
 						},
 					},
 				})
@@ -677,8 +678,8 @@ vim.keymap.set("v", "<space>y", '"+y', {}) -- Copy to system clipboard
 vim.keymap.set("n", "<space>p", '"+p', {}) -- Paste to system clipboard
 
 -- Lsp Mappings
+vim.keymap.set("n", "<leader>fr", ":Forge<CR>", { silent = true }) -- Open Forge.nvim
 vim.keymap.set("n", "<leader>lh", vim.lsp.buf.hover, {}) -- Show hover information
 vim.keymap.set("n", "<leader>ld", vim.lsp.buf.definition, {}) -- Jump to definition
 vim.keymap.set("n", "<leader>ln", vim.diagnostic.goto_next, {}) -- Go to next LSP diagnostic
 vim.keymap.set("n", "<leader>lp", vim.diagnostic.goto_prev, {}) -- Go to previous LSP diagnostic
-vim.keymap.set("n", "<leader>li", ":Mason<CR>", { silent = true }) -- Install LSP

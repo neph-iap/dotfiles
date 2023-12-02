@@ -193,6 +193,9 @@ function cfg() {
 		"picom")
 			nvim ~/.config/picom.conf
 			;;
+		"stylua")
+			nvim ~/.config/stylua/stylua.toml
+			;;
 		"wezterm")
 			nvim ~/.config/wezterm/wezterm.lua
 			;;

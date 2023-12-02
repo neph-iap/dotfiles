@@ -98,7 +98,7 @@ function sidebar:refresh_numbers()
 	end
 	table.insert(month, week_days)
 
-	for week_number = 1, 5 do
+	for week_number = 1, 6 do
 		local week = { layout = wibox.layout.flex.horizontal }
 		for day = 1, 7 do
 			local day_number = (week_number - 1) * 7 + day - first_of_month + 1

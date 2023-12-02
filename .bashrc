@@ -221,6 +221,7 @@ alias ls='ls --color=auto' # Add colors to ls
 alias grep='grep --color=auto' # Add colors to grep
 alias tux="ssh $tux"
 alias neofetch="neofetch --iterm2 ~/Pictures/arch.png --size 500"
+alias odstatus="journalctl --user-unit onedrive -f"
 
 export tux="ndi26@tux.cs.drexel.edu"
 

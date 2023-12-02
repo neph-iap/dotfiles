@@ -25,6 +25,10 @@ vim.opt.shiftwidth = 4 -- Use tabstop for automatic tabs
 vim.opt.showcmd = false -- Don't show keypressed
 vim.opt.termguicolors = true -- Use true color in the terminal
 
+-- Image.nvim - requires magick luarocks
+package.path = package.path .. ";" .. vim.fn.expand("$HOME") .. "/.luarocks/share/lua/5.1/?/init.lua;"
+package.path = package.path .. ";" .. vim.fn.expand("$HOME") .. "/.luarocks/share/lua/5.1/?.lua;"
+
 -- Enable word wrapping for text files such as markdown or text
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "markdown", "text" },
@@ -85,7 +89,9 @@ require("lazy").setup(
 				"nvim-lua/plenary.nvim",
 				"nvim-tree/nvim-web-devicons",
 				"MunifTanjim/nui.nvim",
-				"3rd/image.nvim",
+				{ "3rd/image.nvim", opts = {
+					backend = "ueberzug",
+				} },
 			},
 			config = function()
 				require("nvim-web-devicons").setup({
@@ -174,7 +180,7 @@ require("lazy").setup(
 						end
 
 						-- Open Neotree in the project root directory
-						vim.cmd("Neotree dir=" .. root_directory)
+						vim.cmd("Neotree dir=" .. root_directory:gsub(" ", "\\ "))
 					end,
 					desc = "Neotree",
 				},
@@ -232,6 +238,7 @@ require("lazy").setup(
 										Typescriptreact = "TypeScript + Syntax Extension",
 										Javascriptreact = "JavaScript + Syntax Extension",
 										Gitignore = "Git Ignore",
+										Scss = "Sass",
 									}
 
 									if special_formats[formatted] then
@@ -642,6 +649,28 @@ require("lazy").setup(
 			opts = {},
 			keys = { { "<leader>b", "<cmd>EasyColor<cr>", desc = "Easy Color" } },
 		},
+
+		-- Open alternate files
+		{
+			"rgroli/other.nvim",
+			main = "other-nvim",
+			opts = {
+				mappings = {
+					-- Night Kitchen React
+					{
+						pattern = "(.*).js",
+						target = "%1.module.scss",
+					},
+					{
+						pattern = "(.*).module.scss",
+						target = "%1.js",
+					},
+				},
+			},
+			keys = {
+				{ "<leader>o", "<cmd>Other<cr>", desc = "Open Alternate File" },
+			},
+		},
 	},
 
 	-- Options for lazy.nvim
@@ -676,8 +705,8 @@ vim.keymap.set("n", "<leader>eu", ":wincmd p<CR>", { silent = true }) -- Unfocus
 vim.keymap.set("n", "<leader>nc", ":NoiceDismiss<CR>", { silent = true }) -- Dismiss notifications
 vim.keymap.set("v", "<space>y", '"+y', {}) -- Copy to system clipboard
 vim.keymap.set("n", "<space>p", '"+p', {}) -- Paste to system clipboard
-vim.keymap.set("n", "j", "gj", {}) -- Move down by visual line
-vim.keymap.set("n", "k", "gk", {}) -- Move up by visual line
+vim.keymap.set("n", "j", "gj", {}) -- Move down by display line
+vim.keymap.set("n", "k", "gk", {}) -- Move up by display line
 
 -- Lsp Mappings
 vim.keymap.set("n", "<leader>fr", ":Forge<CR>", { silent = true }) -- Open Forge.nvim

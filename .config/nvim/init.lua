@@ -193,13 +193,16 @@ require("lazy").setup(
 			dependencies = { "nvim-tree/nvim-web-devicons" },
 			config = function()
 				require("lualine").setup({
+					options = {
+						component_separators = { left = "", right = "" },
+						section_separators = { left = "", right = "" },
+					},
 					extensions = {
 						"neo-tree",
 						"lazy",
 						"mason",
 					},
 					sections = {
-
 						-- Set mode name to Camelcase
 						lualine_a = {
 							{
@@ -398,7 +401,7 @@ require("lazy").setup(
 		{
 			"neph-iap/one-midnight.nvim",
 			config = function()
-				require("onedark").load()
+				require("one-midnight").load()
 			end,
 		},
 

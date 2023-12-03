@@ -62,6 +62,7 @@ function public.setup(widgets)
 		awful.key({ modkey, "Control" }, "r", f(awesome.restart), { description = "reload awesome", group = "awesome" }),
 		awful.key({ modkey, "Shift" }, "q", f(awesome.quit), { description = "quit awesome", group = "awesome" }),
 		awful.key({ modkey }, "l", f(function() awful.layout.inc(1) end), { description = "select next", group = "layout" }),
+		awful.key({}, "Print", f(function() awful.spawn.with_shell('flameshot full --path "' .. os.getenv("HOME") .. '/Pictures/Screenshots/' .. tostring(os.date("%x")):gsub("/", "_") .. " at " .. tostring(os.date("%X")):gsub(":|%s", "_") .. '"') end), { description = "take a screenshot", group = "awesome" }),
 
 		-- Brightness
 		awful.key({}, "XF86MonBrightnessUp", function() os.execute("brightnessctl set +10%"); widgets.menu:refresh_numbers(); widgets.brightness:show() end, { description = "Increase brightness", group = "brightness" }),

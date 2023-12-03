@@ -1,7 +1,7 @@
 local ruled = require("ruled")
 local awful = require("awful")
 local naughty = require("naughty")
-local theme = require("../theme")
+local theme = require("misc.theme")
 
 naughty.config.spacing = theme.custom.default_margin
 naughty.config.padding = theme.custom.default_margin

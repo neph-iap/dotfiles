@@ -1,8 +1,8 @@
 local wibox = require("wibox")
 local awful = require("awful")
 local gears = require("gears")
-local theme = require("../theme")
-local preferences = require("preferences")
+local theme = require("misc.theme")
+local preferences = require("misc.preferences")
 
 local sidebar = wibox({ visible = false, ontop = true, type = "dock", screen = screen.primary })
 sidebar.width = 400

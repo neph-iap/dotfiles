@@ -1,6 +1,6 @@
 local wibox = require("wibox")
 local awful = require("awful")
-local theme = require("../theme")
+local theme = require("misc.theme")
 local gears = require("gears")
 
 local apps = { "wezterm", "firefox", "discord" }

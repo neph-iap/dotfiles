@@ -1,6 +1,6 @@
 local wibox = require("wibox")
 local awful = require("awful")
-local theme = require("../theme")
+local theme = require("misc.theme")
 
 local launcher = wibox({ visible = false, ontop = true, type = "dock", screen = screen.primary })
 launcher.width = 300

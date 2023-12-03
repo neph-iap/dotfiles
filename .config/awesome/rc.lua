@@ -17,9 +17,9 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 require("awful.autofocus")
 require("awful.hotkeys_popup.keys")
 
-local preferences = require("preferences")
+local preferences = require("misc.preferences")
 
-require("startup") -- Handle errors on startup
+require("misc.startup") -- Handle errors on startup
 
 beautiful.init(os.getenv("HOME") .. "/.config/awesome/theme.lua") -- Initialize theme
 
@@ -45,7 +45,7 @@ menu.setup({
 require("widgets.notification")
 
 -- Initialize hotkeys
-local keys = require("keys")
+local keys = require("misc.keys")
 keys.setup({
 	sidebar = sidebar.widget,
 	menu = menu.widget,

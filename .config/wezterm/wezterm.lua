@@ -20,6 +20,7 @@ config.allow_square_glyphs_to_overflow_width = "Never"
 
 config.keys = {
 	{ key = "v", mods = "CTRL", action = wezterm.action.PasteFrom("Clipboard") },
+	-- { key = "a", mods = "CTRL", action = wezterm.action({ SelectText = {} }) },
 }
 
 return config

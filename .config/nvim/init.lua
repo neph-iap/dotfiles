@@ -485,7 +485,10 @@ require("lazy").setup(
 		-- Highlight comments with  TODO: in them such as this, as well as FIXME and others
 		{
 			"folke/todo-comments.nvim",
-			dependencies = "nvim-lua/plenary.nvim",
+			dependencies = {
+				"nvim-lua/plenary.nvim",
+				"folke/trouble.nvim",
+			},
 			config = function()
 				require("todo-comments").setup({})
 			end,

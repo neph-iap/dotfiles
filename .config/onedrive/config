@@ -1,2 +1,2 @@
 sync_dir = "~"
-skip_file = ".*"
+skip_file = ""

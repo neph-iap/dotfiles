@@ -8,6 +8,9 @@ launcher.height = 500
 launcher.visible = true
 launcher.bg = theme.custom.primary_background
 
+local apps = {}
+local done_apps = false
+
 local function get_app_icon(app_name)
 	local dirs_to_check = {
 		"scalable",
@@ -28,60 +31,31 @@ local function get_app_icon(app_name)
 
 	for _, dir in ipairs(dirs_to_check) do
 		local path_to_directory = "/usr/share/icons/hicolor/" .. dir .. "/apps/"
-		local dirs = assert(io.popen("ls " .. path_to_directory))
-		for file in dirs:lines() do
-			if file:match("%f[%a]" .. app_name .. "%f[%A]") then
-				return path_to_directory .. file
+		awful.spawn.easy_async_with_shell("ls " .. path_to_directory, function(dirs)
+			for file in dirs:lines() do
+				if file:match("%f[%a]" .. app_name .. "%f[%A]") then
+					apps[app_name] = path_to_directory .. file
+				end
 			end
-		end
-		dirs:close()
+			dirs:close()
+			if done_apps then
+				launcher:refresh_numbers()
+				require("naughty").notify({ title = "Launcher Widget", text = "Launcher loaded" })
+			end
+		end)
 	end
-
-	return nil
 end
 
 awful.placement.top_right(launcher, { honor_workarea = true, margins = { right = theme.custom.default_margin + 500, top = theme.custom.default_margin } })
 
-local apps = {}
-
-for directory in io.popen("ls /usr/bin"):lines() do
-	table.insert(apps, directory)
-end
-
-local app_widgets = { layout = wibox.layout.fixed.vertical }
-for _, app in ipairs(apps) do
-	if not app:match("[%w%s]+") then
-		goto continue
+awful.spawn.easy_async_with_shell("ls /usr/bin", function(directories)
+	for app in directories:gmatch("[^\n]+") do
+		if app:match("[%w%s]+") then
+			get_app_icon(app)
+		end
 	end
-
-	local app_icon = get_app_icon(app)
-
-	if not app_icon then
-		goto continue
-	end
-
-	local icon_widget = wibox.widget.imagebox(app_icon)
-	icon_widget.forced_width = 70
-	icon_widget.forced_height = 70
-	local name_widget = wibox.widget.textbox()
-	name_widget.markup = ('<span color="%s">%s</span>'):format(theme.custom.primary_foreground, app:gsub("^%l", string.upper))
-	name_widget.font = "OpenSans 20"
-	local app_widget = {
-		{
-			icon_widget,
-			widget = wibox.container.margin,
-			top = 15,
-			left = 15,
-			right = 15,
-			bottom = 15,
-		},
-		name_widget,
-		layout = wibox.layout.fixed.horizontal,
-	}
-	table.insert(app_widgets, app_widget)
-
-	::continue::
-end
+	done_apps = true
+end)
 
 local function levenshtein(a, b)
 	if a == b then
@@ -124,7 +98,35 @@ local function levenshtein(a, b)
 	return v0[n]
 end
 
+local app_widgets
+
 function launcher:refresh_numbers()
+	app_widgets = { layout = wibox.layout.fixed.vertical }
+
+	for app, app_icon in pairs(apps) do
+		local icon_widget = wibox.widget.imagebox(app_icon)
+		icon_widget.forced_width = 70
+		icon_widget.forced_height = 70
+
+		local name_widget = wibox.widget.textbox()
+		name_widget.markup = ('<span color="%s">%s</span>'):format(theme.custom.primary_foreground, app:gsub("^%l", string.upper))
+		name_widget.font = "OpenSans 20"
+
+		local app_widget = {
+			{
+				icon_widget,
+				widget = wibox.container.margin,
+				top = 15,
+				left = 15,
+				right = 15,
+				bottom = 15,
+			},
+			name_widget,
+			layout = wibox.layout.fixed.horizontal,
+		}
+		table.insert(app_widgets, app_widget)
+	end
+
 	launcher:setup({
 		{
 			app_widgets,
@@ -175,8 +177,6 @@ function launcher:toggle()
 		launcher:refresh_numbers()
 	end
 end
-
-launcher.visible = false
 
 return {
 	widget = launcher,

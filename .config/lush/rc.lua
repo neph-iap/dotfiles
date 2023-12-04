@@ -1,6 +1,7 @@
 local lfs = require("lfs")
 
-prompt = "> "
+prompt = "┣━ "
+
 local editor = nvim
 
 function cfg(app)
@@ -12,11 +13,16 @@ function cfg(app)
 		wezterm = "~/.config/wezterm/wezterm.lua",
 	}
 
-	if config_files[app] then editor(config_files[app]) else print("Uknown application: " .. app) end
+	if config_files[app] then
+		editor(config_files[app])
+	else
+		print("Uknown application: " .. app)
+	end
 end
 
 function cd(path)
-	print("hi")
+	clear()
+	print("┏━ " .. pipe(pwd) .. ":")
 	builtin.cd(path)
 	for entry in lfs.dir(".") do
 		print(entry)

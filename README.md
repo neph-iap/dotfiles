@@ -1,5 +1,7 @@
 # dotfiles
 
+![docs](./.docs/demo.png)
+
 Sane dotfiles for an Arch user, providing configuration for the following programs:
 
 - Neovim

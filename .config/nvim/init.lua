@@ -482,7 +482,7 @@ require("lazy").setup(
 			end,
 		},
 
-		-- Highlight comments with  TODO: in them such as this, as well as FIXME and others
+		-- Highlight comments with  TODO: in them such as this, as well as FIXME and others, also creates a list of them
 		{
 			"folke/todo-comments.nvim",
 			dependencies = {

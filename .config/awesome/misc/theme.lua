@@ -3,8 +3,8 @@ local theme = {}
 -- Values to be ignored by beautiful and used for custom widgets
 theme.custom = {
 	primary_background = "#0E0C12",
-	primary_foreground = "#A080E4",
-	secondary_foreground = "#54496B",
+	primary_foreground = "#9280FF",
+	secondary_foreground = "#50496B",
 	default_margin = 10,
 }
 

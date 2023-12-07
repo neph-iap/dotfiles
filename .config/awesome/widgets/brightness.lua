@@ -8,7 +8,10 @@ brightness_bar.width = 300
 brightness_bar.height = 50
 brightness_bar.bg = theme.custom.primary_background
 
-awful.placement.top_right(brightness_bar, { honor_workarea = true, margins = { right = theme.custom.default_margin, top = theme.custom.default_margin } })
+awful.placement.top_right(
+	brightness_bar,
+	{ honor_workarea = true, margins = { right = theme.custom.default_margin, top = theme.custom.default_margin } }
+)
 
 function brightness_bar:refresh_numbers()
 	local brightness = tonumber(io.popen("brightnessctl get"):read("a"))

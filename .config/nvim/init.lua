@@ -38,6 +38,13 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
+vim.api.nvim_create_autocmd("BufRead", {
+	pattern = { "*.bash*" },
+	callback = function()
+		vim.bo.filetype = "bash"
+	end,
+})
+
 -- Detect LLVM files
 vim.api.nvim_create_autocmd("BufRead", {
 	pattern = "*.ll",

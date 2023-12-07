@@ -282,12 +282,7 @@ function sidebar:refresh_numbers()
 						battery_text,
 						layout = wibox.layout.fixed.horizontal,
 					},
-					{
-						disk_icon,
-						disk_usage_widget,
-						disk_text,
-						layout = wibox.layout.fixed.horizontal,
-					},
+					{ disk_icon, disk_usage_widget, disk_text, layout = wibox.layout.fixed.horizontal },
 					{
 						cpu_temperature_icon,
 						cpu_temperature_widget,

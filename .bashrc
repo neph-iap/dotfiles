@@ -1,7 +1,7 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-~/.bash_private
+. ~/.bash_private
 
 # Environment variables
 export PS1="┣━ " # Set Bash prompt
@@ -204,6 +204,12 @@ function cfg() {
 			;;
 	esac
 }
+
+_cfg() {
+	local cur=${COMP_WORDS[COMP_CWORD]}
+	COMPREPLY=( $(compgen -W "awesome lush nvim bash picom stylua wezterm" -- $cur) )
+}
+complete -F _cfg cfg
 
 # Print the here directory
 cd .

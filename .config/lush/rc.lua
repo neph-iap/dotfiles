@@ -1,6 +1,4 @@
-local lfs = require("lfs")
-
-prompt = "┣━ "
+prompt = "> "
 
 local editor = nvim
 
@@ -16,15 +14,6 @@ function cfg(app)
 	if config_files[app] then
 		editor(config_files[app])
 	else
-		print("Uknown application: " .. app)
-	end
-end
-
-function cd(path)
-	clear()
-	print("┏━ " .. pipe(pwd) .. ":")
-	builtin.cd(path)
-	for entry in lfs.dir(".") do
-		print(entry)
+		print("Unknown app: " .. app)
 	end
 end

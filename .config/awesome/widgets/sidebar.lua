@@ -116,6 +116,10 @@ function sidebar:refresh_numbers()
 				color = theme.custom.secondary_foreground
 			end
 
+			if week_number == 6 and day_number == 1 and day_number < 8 then
+				goto continue
+			end
+
 			local is_today = false
 			if color == theme.custom.primary_foreground and day_number == today.day then
 				color = theme.custom.primary_background
@@ -158,6 +162,7 @@ function sidebar:refresh_numbers()
 			end)
 
 			table.insert(week, day_widget)
+			::continue::
 		end
 		table.insert(month, week)
 	end
@@ -166,12 +171,21 @@ function sidebar:refresh_numbers()
 
 	local calendar_left = wibox.widget.textbox()
 	calendar_left.markup = ('<span color="%s">    󰍞</span>'):format(theme.custom.primary_foreground)
-	calendar_left.font = "OpenSans 20"
+	calendar_left.font = "OpenSans 10"
 
 	local calendar_right = wibox.widget.textbox()
 	calendar_right.markup = ('<span color="%s">󰍟   </span>'):format(theme.custom.primary_foreground)
-	calendar_right.font = "OpenSans 20"
+	calendar_right.font = "OpenSans 10"
 	calendar_right.align = "right"
+	calendar_right:connect_signal("button::press", function()
+		today.month = today.month + 1
+		if today.month > 12 then
+			today.month = 1
+			today.year = today.year + 1
+		end
+		calendar_title.markup = ('<span color="%s">%s</span>'):format(theme.custom.primary_foreground, months[today.month])
+		sidebar:refresh_numbers()
+	end)
 
 	local battery_percentage = tonumber(io.open("/sys/class/power_supply/BAT0/capacity"):read("a"))
 	local is_charging = io.open("/sys/class/power_supply/BAT0/status"):read("a"):match("%s*([^%s]+)%s*") == "Charging"
@@ -284,7 +298,7 @@ function sidebar:refresh_numbers()
 					spacing = 25,
 				},
 				layout = wibox.layout.fixed.vertical,
-				spacing = 100,
+				spacing = 50,
 			},
 			widget = wibox.container.background,
 			forced_width = 400,

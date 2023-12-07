@@ -116,6 +116,10 @@ require("lazy").setup(
 						filtered_items = {
 							visible = true,
 							hide_gitignored = false,
+							hide_dotfiles = false,
+							never_show_by_pattern = {
+								"*.meta",
+							},
 						},
 					},
 					window = {
@@ -232,6 +236,7 @@ require("lazy").setup(
 									local formatted = type:sub(1, 1):upper() .. type:sub(2, type:len())
 									local special_formats = {
 										Cs = "C#",
+										Cpp = "C++",
 										Javscript = "JavaScript",
 										Typescript = "TypeScript",
 										Llvm = "LLVM",
@@ -267,10 +272,10 @@ require("lazy").setup(
 								fmt = function()
 									local path = vim.fn.expand("%:p")
 									local cwd = vim.fn.getcwd()
-									if path:sub(1, cwd:len()) == cwd then
+									if path:sub(1, cwd:len()):gsub("\\", "/") == cwd:gsub("\\", "/") then
 										path = path:sub(cwd:len() + 2, path:len())
 									end
-									if path == ".config/nvim/init.lua" then
+									if path == "/home/neph/.config/nvim/init.lua" then
 										path = " Neovim Config"
 									end
 									return path
@@ -459,6 +464,7 @@ require("lazy").setup(
 				---@diagnostic disable-next-line missing-fields
 				require("notify").setup({
 					top_down = false, -- Send notifications to the bottom of the screen instead of the top
+					background_colour = "#00000000", -- Background color
 				})
 
 				require("noice").setup({
@@ -606,14 +612,14 @@ require("lazy").setup(
 				"neovim/nvim-lspconfig", -- LSP Configuration
 				"williamboman/mason-lspconfig.nvim", -- LSP Configuration for Mason
 				"folke/neodev.nvim", -- Neovim development environment
-				"stevearc/conform.nvim", -- Auto formatting
-				"hrsh7th/nvim-cmp", -- Autocomplete
-				"L3MON4D3/LuaSnip", -- Snippets
-				"hrsh7th/cmp-nvim-lsp", -- LSP integration with autocomplete
-				"hrsh7th/cmp-cmdline", -- Autocomplete in command line
-				"hrsh7th/cmp-buffer", -- Autocomplete for the buffer
-				"hrsh7th/cmp-path", -- Autocomplete for file paths
-				"onsails/lspkind.nvim", -- Icons in autocomplete
+				{ "stevearc/conform.nvim", lazy = true }, -- Auto formatting
+				{ "hrsh7th/nvim-cmp", lazy = true }, -- Autocomplete
+				{ "hrsh7th/cmp-nvim-lsp", lazy = true }, -- LSP integration with autocomplete
+				{ "hrsh7th/cmp-cmdline", lazy = true }, -- Autocomplete in command line
+				{ "hrsh7th/cmp-buffer", lazy = true }, -- Autocomplete for the buffer
+				{ "hrsh7th/cmp-path", lazy = true }, -- Autocomplete for file paths
+				{ "L3MON4D3/LuaSnip", lazy = true }, -- Snippets
+				{ "onsails/lspkind.nvim", lazy = true }, -- Icons in autocomplete
 			},
 			opts = {},
 		},
@@ -652,7 +658,7 @@ require("lazy").setup(
 
 		-- Color picker
 		{
-			"neph-iap/easycolor.nvim",
+			dir = "~/Documents/Coding/Neovim Plugins/easycolor.nvim",
 			dependencies = { "stevearc/dressing.nvim" },
 			opts = {},
 			keys = { { "<leader>b", "<cmd>EasyColor<cr>", desc = "Easy Color" } },
@@ -678,6 +684,11 @@ require("lazy").setup(
 			keys = {
 				{ "<leader>o", "<cmd>Other<cr>", desc = "Open Alternate File" },
 			},
+		},
+
+		{
+			"xiyaowong/transparent.nvim",
+			opts = {},
 		},
 	},
 
@@ -711,6 +722,7 @@ require("lazy").setup(
 vim.keymap.set("n", "<leader>z", ":Lazy<CR>", { silent = true }) -- Open Lazy.nvim package manager
 vim.keymap.set("n", "<leader>eu", ":wincmd p<CR>", { silent = true }) -- Unfocus file tree
 vim.keymap.set("n", "<leader>nc", ":NoiceDismiss<CR>", { silent = true }) -- Dismiss notifications
+vim.keymap.set("n", "<C-v>", "i<C-v><Esc>", {}) -- Paste from clipboard in normal mode
 vim.keymap.set("v", "<space>y", '"+y', {}) -- Copy to system clipboard
 vim.keymap.set("n", "<space>p", '"+p', {}) -- Paste to system clipboard
 vim.keymap.set("n", "j", "gj", {}) -- Move down by display line

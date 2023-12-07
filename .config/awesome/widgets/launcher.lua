@@ -5,7 +5,6 @@ local theme = require("misc.theme")
 local launcher = wibox({ visible = false, ontop = true, type = "dock", screen = screen.primary })
 launcher.width = 300
 launcher.height = 500
-launcher.visible = true
 launcher.bg = theme.custom.primary_background
 
 local apps = {}
@@ -46,7 +45,10 @@ local function get_app_icon(app_name)
 	end
 end
 
-awful.placement.top_right(launcher, { honor_workarea = true, margins = { right = theme.custom.default_margin + 500, top = theme.custom.default_margin } })
+awful.placement.top_right(
+	launcher,
+	{ honor_workarea = true, margins = { right = theme.custom.default_margin + 500, top = theme.custom.default_margin } }
+)
 
 awful.spawn.easy_async_with_shell("ls /usr/bin", function(directories)
 	for app in directories:gmatch("[^\n]+") do

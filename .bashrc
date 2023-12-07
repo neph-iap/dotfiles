@@ -219,7 +219,6 @@ cd .
 . "$HOME/.cargo/env"
 
 # Aliases
-alias logoff="i3-msg exit" # Logoff 
 alias i="sudo pacman -S" # Install a package
 alias img="kitty icat" # View images with Kitty
 alias dim="brightnessctl set 10%-" # Lower brightness

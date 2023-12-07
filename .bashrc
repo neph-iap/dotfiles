@@ -1,6 +1,7 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+# Private variables such as API keys
 . ~/.bash_private
 
 # Environment variables
@@ -244,15 +245,8 @@ function c() {
 	fname="${1%.*}"
 	gcc -o "$fname" "$fname.c"
 	./"$fname"
+	rm "$fname"
 }
 
 # Set tab size
 tabs -4
-
-# Start joshuto
-
-# cd ~/Documents/Coding/Lua/lush
-# lua init.lua
-# lush
-
-# files

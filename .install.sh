@@ -25,7 +25,6 @@ echo "Enabling services..."
 sudo systemctl enable lightdm
 sudo systemctl enable NetworkManager
 systemctl enable --user onedrive
-systemctl start --user onedrive
 
 # Print messages
 echo "Installation complete! Reload AwesomeWM for changes to take effect."

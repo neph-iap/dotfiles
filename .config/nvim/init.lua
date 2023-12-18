@@ -38,31 +38,23 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
-vim.api.nvim_create_autocmd("BufRead", {
-	pattern = { "*.bash*" },
-	callback = function()
-		vim.bo.filetype = "bash"
-	end,
-})
+local filetypes = {
+	["*.bash*"] = "bash",
+	["*.ll"] = "llvm",
+	["*.rasi"] = "rasi",
+	["*.pest"] = "pest",
+}
 
--- Detect LLVM files
-vim.api.nvim_create_autocmd("BufRead", {
-	pattern = "*.ll",
-	callback = function()
-		vim.bo.filetype = "llvm"
-	end,
-})
-
--- Detect Rasi files
-vim.api.nvim_create_autocmd("BufRead", {
-	pattern = "*.rasi",
-	callback = function()
-		vim.bo.filetype = "rasi"
-	end,
-})
+for pattern, filetype in pairs(filetypes) do
+	vim.api.nvim_create_autocmd("BufRead", {
+		pattern = pattern,
+		callback = function()
+			vim.bo.filetype = filetype
+		end,
+	})
+end
 
 vim.g.zig_fmt_autosave = false -- Disable Zig autoformatting which for some reason converts my enums into massive one-liners
-vim.g.rustfmt_autosave = true -- Enable Rust formatting on save
 
 vim.g.mapleader = " " -- Set leader to space - must be done before mappings
 
@@ -96,23 +88,54 @@ require("lazy").setup(
 				"nvim-lua/plenary.nvim",
 				"nvim-tree/nvim-web-devicons",
 				"MunifTanjim/nui.nvim",
-				{ "3rd/image.nvim", opts = {
-					backend = "ueberzug",
-				} },
+				{
+					"3rd/image.nvim",
+					opts = {
+						backend = "ueberzug",
+					},
+				},
+				{
+					"folke/edgy.nvim",
+					opts = {
+						wo = {
+							winbar = false,
+						},
+						bottom = {
+							"toggleterm",
+							size = 15,
+						},
+						left = {
+							"neo-tree",
+							size = 35,
+						},
+						animate = {
+							enabled = false,
+						},
+					},
+				},
 			},
 			config = function()
 				require("nvim-web-devicons").setup({
 					override = {
+						-- Color overrides
 						cs = { icon = "", color = "#8800EE", name = "Cs" },
-						docx = { icon = "", color = "#7777FF", name = "Word" },
+						txt = { icon = "󰬴", color = "#999999", name = "Text" },
+
+						-- Icons for files missing them
 						ll = { icon = "", color = "#999999", name = "LLVM" },
-						pdf = { icon = "", color = "#FF4444", name = "PDF" },
 						rkt = { icon = "λ", color = "#FF6666", name = "Racket" },
-						txt = { icon = "", color = "#999999", name = "Text" },
-						svelte = { icon = "", color = "#FF4900", name = "Svelte" },
-						svg = { icon = "☼", color = "#6688FF", name = "SVG" },
-						tex = { icon = "𝒙", color = "#999999", name = "LaTeX" },
 						asm = { icon = "", color = "#999999", name = "Assembly" },
+						unity = { icon = "󰚯", color = "#DDDDDD", name = "Unity" },
+						prefab = { icon = "󰚯", color = "#DDDDDD", name = "UnityPrefab" },
+						obj = { icon = "󰆧", color = "#88AAFF", name = "WavefrontObject" },
+						gltf = { icon = "󰆧", color = "#88AAFF", name = "GLTF" },
+						blend = { icon = "󰂫", color = "#EA7600", name = "BlenderObject" },
+						o = { icon = "󰘔", color = "#888888", name = "Object" },
+						pest = { icon = "󰱯", color = "#2800C6", name = "Pest" },
+						toggleterm = { icon = "", color = "#888888", name = "Terminal" },
+
+						-- Icon overrides
+						tex = { icon = "𝒙", color = "#999999", name = "LaTeX" },
 					},
 				})
 
@@ -128,6 +151,10 @@ require("lazy").setup(
 								"*.meta",
 							},
 						},
+						follow_current_file = {
+							enabled = true,
+						},
+						use_libuv_file_watcher = true,
 					},
 					window = {
 						position = "left",
@@ -214,6 +241,9 @@ require("lazy").setup(
 						"neo-tree",
 						"lazy",
 						"mason",
+						-- "toggleterm",
+						"trouble",
+						"man",
 					},
 					sections = {
 						-- Set mode name to Camelcase
@@ -256,6 +286,7 @@ require("lazy").setup(
 										Javascriptreact = "JavaScript + Syntax Extension",
 										Gitignore = "Git Ignore",
 										Scss = "Sass",
+										Toggleterm = "Terminal",
 									}
 
 									if special_formats[formatted] then
@@ -283,7 +314,11 @@ require("lazy").setup(
 										path = path:sub(cwd:len() + 2, path:len())
 									end
 									if path == "/home/neph/.config/nvim/init.lua" then
-										path = " Neovim Config"
+										path = " Neovim Config"
+									end
+
+									if path:sub(1, #"term:") == "term:" then
+										path = " Terminal"
 									end
 									return path
 								end,
@@ -308,7 +343,12 @@ require("lazy").setup(
 							{
 								"location",
 								fmt = function()
-									return vim.fn.line("$") .. " Lines"
+									---@type number | string
+									local lines = vim.fn.line("$")
+									if lines > 1000 then
+										lines = "‼ " .. lines
+									end
+									return lines .. " Lines"
 								end,
 							},
 						},
@@ -400,6 +440,7 @@ require("lazy").setup(
 									"-A", "clippy::multiple_crate_versions", -- Multiple versions of a dependency crate
 									"-A", "clippy::module_name_repetitions", -- Repeating module name in identifiers
 									"-A", "clippy::cast_precision_loss", -- Casting between numeric types where precision may be lost (such as an i32 to an i16)
+									"-A", "clippy::cast_lossless",
 
 									-- stylua: ignore end
 								},
@@ -423,7 +464,6 @@ require("lazy").setup(
 		{
 			"stevearc/dressing.nvim",
 			keys = {
-				{ "<leader>lr", vim.lsp.buf.rename, desc = "Rename" },
 				{ "<leader>ly", vim.lsp.buf.code_action, desc = "Accept Code Action" },
 			},
 		},
@@ -444,9 +484,7 @@ require("lazy").setup(
 		-- Highlight colors in the editor such as #4a08a9, rgb(0, 255, 255), and hsl(150, 100, 50)
 		{
 			"brenoprata10/nvim-highlight-colors",
-			config = function()
-				require("nvim-highlight-colors").setup({})
-			end,
+			opts = {},
 		},
 
 		-- Live markdown preview
@@ -500,11 +538,9 @@ require("lazy").setup(
 			"folke/todo-comments.nvim",
 			dependencies = {
 				"nvim-lua/plenary.nvim",
-				"folke/trouble.nvim",
+				{ "folke/trouble.nvim", cmd = "TodoTrouble" },
 			},
-			config = function()
-				require("todo-comments").setup({})
-			end,
+			opts = {},
 		},
 
 		-- Better UI for find and replace
@@ -612,13 +648,13 @@ require("lazy").setup(
 
 		-- Language tool manager
 		{
-			"neph-iap/forge.nvim",
+			dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/forge.nvim",
 			dependencies = {
 				"nvim-treesitter/nvim-treesitter", -- Semantic highlighter
 				"williamboman/mason.nvim", -- LSP Installer
 				"neovim/nvim-lspconfig", -- LSP Configuration
 				"williamboman/mason-lspconfig.nvim", -- LSP Configuration for Mason
-				"folke/neodev.nvim", -- Neovim development environment
+				{ "folke/neodev.nvim", ft = "lua" }, -- Neovim development environment
 				{ "stevearc/conform.nvim", lazy = true }, -- Auto formatting
 				{ "hrsh7th/nvim-cmp", lazy = true }, -- Autocomplete
 				{ "hrsh7th/cmp-nvim-lsp", lazy = true }, -- LSP integration with autocomplete
@@ -665,7 +701,7 @@ require("lazy").setup(
 
 		-- Color picker
 		{
-			dir = "~/Documents/Coding/Neovim Plugins/easycolor.nvim",
+			dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/easycolor.nvim",
 			dependencies = { "stevearc/dressing.nvim" },
 			opts = {},
 			keys = { { "<leader>b", "<cmd>EasyColor<cr>", desc = "Easy Color" } },
@@ -693,8 +729,69 @@ require("lazy").setup(
 			},
 		},
 
+		-- Transparent background
 		{
 			"xiyaowong/transparent.nvim",
+			opts = {},
+		},
+
+		-- Terminal toggler
+		{
+			"akinsho/toggleterm.nvim",
+			dependencies = {
+				{
+					"folke/edgy.nvim",
+					opts = {
+						wo = {
+							winbar = false,
+						},
+						bottom = {
+							"toggleterm",
+							size = 15,
+						},
+						left = {
+							"neo-tree",
+							size = 35,
+						},
+						animate = {
+							enabled = false,
+						},
+					},
+				},
+			},
+			opts = {},
+			keys = {
+				{ "<C-`>", "<cmd>ToggleTerm<cr>", desc = "Toggle Terminal" },
+			},
+		},
+
+		-- Pest support
+		{
+			"pest-parser/pest.vim",
+			ft = "pest",
+		},
+
+		-- Incremental LSP rename
+		{
+			"smjonas/inc-rename.nvim",
+			dependencies = { "stevearc/dressing.nvim" },
+			opts = {
+				input_buffer_type = "dressing",
+			},
+			keys = {
+				{ "<leader>lr", ":IncRename ", desc = "Incremental Rename" },
+			},
+		},
+
+		-- Lotus support
+		{
+			dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/lotus.nvim",
+			opts = {},
+		},
+
+		-- Cargo
+		{
+			dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/cargo.nvim",
 			opts = {},
 		},
 	},
@@ -727,13 +824,14 @@ require("lazy").setup(
 
 -- General
 vim.keymap.set("n", "<leader>z", ":Lazy<CR>", { silent = true }) -- Open Lazy.nvim package manager
-vim.keymap.set("n", "<leader>eu", ":wincmd p<CR>", { silent = true }) -- Unfocus file tree
+vim.keymap.set("n", "<leader>eu", ":wincmd p<CR>", { silent = true }) -- Unfocus file explorer
 vim.keymap.set("n", "<leader>nc", ":NoiceDismiss<CR>", { silent = true }) -- Dismiss notifications
 vim.keymap.set("n", "<C-v>", "i<C-v><Esc>", {}) -- Paste from clipboard in normal mode
 vim.keymap.set("v", "<space>y", '"+y', {}) -- Copy to system clipboard
 vim.keymap.set("n", "<space>p", '"+p', {}) -- Paste to system clipboard
 vim.keymap.set("n", "j", "gj", {}) -- Move down by display line
 vim.keymap.set("n", "k", "gk", {}) -- Move up by display line
+vim.keymap.set("n", "d_", "dt_", {}) -- Delete to next underscore
 
 -- Lsp Mappings
 vim.keymap.set("n", "<leader>fr", ":Forge<CR>", { silent = true }) -- Open Forge.nvim

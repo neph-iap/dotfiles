@@ -11,8 +11,8 @@ rm -rf yay
 
 # Install packages
 echo "Installing packages..."
-pacman -S firefox neofetch neovim wezterm onefetch
-yay -S joshuto onedrive
+pacman -S firefox neofetch neovim wezterm onefetch lightdm luarocks lua man-pages man-db nodejs networkmanager npm unzip upower ueberzugpp obs-studio clang flameshot feh
+yay -S joshuto onedrive-abraunegg discord
 
 # Install configuration
 echo "Installing configuration..."

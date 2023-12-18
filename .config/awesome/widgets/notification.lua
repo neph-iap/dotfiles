@@ -57,14 +57,14 @@ end)
 local gave_20_warning = false
 local gave_10_warning = false
 awful.widget.watch("cat /sys/class/power_supply/BAT0/capacity", 1, function(_, stdout)
-	if not gave_20_warning and tonumber(stdout) < 20 then
+	if not gave_20_warning and tonumber(stdout) <= 20 then
 		naughty.notify({
 			title = "Battery",
 			text = "Warning: Battery is low (" .. stdout:gsub("\n$", "") .. "%)",
 		})
 		gave_20_warning = true
 	end
-	if not gave_10_warning and tonumber(stdout) < 10 then
+	if not gave_10_warning and tonumber(stdout) <= 10 then
 		naughty.notify({
 			title = "Battery",
 			text = "Warning: Battery is critical (" .. stdout:gsub("\n$", "") .. "%)",

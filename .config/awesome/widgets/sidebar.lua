@@ -152,12 +152,11 @@ function sidebar:refresh_numbers()
 			}
 
 			day_widget[1][1]:connect_signal("mouse::enter", function()
-				day_widget[1][1].markup = ('<span color="%s">%d</span>'):format("#FFFFFF", day_number)
+				self.markup = ('<span color="%s">%d</span>'):format("#FFFFFF", day_number)
 				day_widget.bg = "#FF0000"
-				sidebar:refresh_numbers()
 			end)
 			day_widget[1][1]:connect_signal("mouse::leave", function()
-				day_widget[1][1].markup = ('<span color="%s">%d</span>'):format(color, day_number)
+				self.markup = ('<span color="%s">%d</span>'):format(color, day_number)
 				day_widget.bg = bg
 			end)
 
@@ -190,7 +189,23 @@ function sidebar:refresh_numbers()
 	local battery_percentage = tonumber(io.open("/sys/class/power_supply/BAT0/capacity"):read("a"))
 	local is_charging = io.open("/sys/class/power_supply/BAT0/status"):read("a"):match("%s*([^%s]+)%s*") == "Charging"
 
-	local battery_icon = wibox.widget.textclock(is_charging and "  󰂉" or "  󰁽 ")
+	local battery_icons = {
+		"󱊡", -- 00% - 10%
+		"󰁻", -- 10% - 20%
+		"󰁼", -- 20% - 30%
+		"󰁽", -- 30% - 40%
+		"󰁾", -- 40% - 50%
+		"󰁿", -- 50% - 60%
+		"󰂀", -- 60% - 70%
+		"󰂁", -- 70% - 80%
+		"󰂂", -- 80% - 90%
+		"󰁹", -- 90% - 100%
+		"󰁹", -- 100%
+	}
+
+	local battery_icon_text = battery_icons[math.floor(battery_percentage / 10.0) + 1]
+
+	local battery_icon = wibox.widget.textclock(is_charging and "  󰂉" or "  " .. battery_icon_text .. " ")
 	battery_icon.font = "OpenSans 20"
 
 	local battery = wibox.widget({
@@ -209,7 +224,7 @@ function sidebar:refresh_numbers()
 	local battery_text = wibox.widget.textclock(tostring(battery_percentage .. "%%"))
 	battery_text.font = "OpenSans 15"
 
-	local disk_icon = wibox.widget.textclock("  󰏖")
+	local disk_icon = wibox.widget.textclock("  󰅟")
 	disk_icon.font = "OpenSans 20"
 
 	local disk_usage = tonumber(io.popen("df -H"):read("a"):match("(%d+)%%%s+/home"))
@@ -229,7 +244,7 @@ function sidebar:refresh_numbers()
 	local disk_text = wibox.widget.textclock(tostring(disk_usage) .. "%%")
 	disk_text.font = "OpenSans 15"
 
-	local cpu_temperature_icon = wibox.widget.textclock("  󰘚")
+	local cpu_temperature_icon = wibox.widget.textclock("  ")
 	cpu_temperature_icon.font = "OpenSans 20"
 
 	local cpu_temperature = math.floor(9 / 5 * tonumber(io.popen("cat /sys/class/thermal/thermal_zone2/temp"):read("a")) / 1000 + 32)
@@ -269,11 +284,7 @@ function sidebar:refresh_numbers()
 					calendar,
 					layout = wibox.layout.fixed.vertical,
 					spacing = 25,
-					{
-						wifi,
-						widget = wibox.container.margin,
-						top = 10,
-					},
+					wifi,
 				},
 				{
 					{

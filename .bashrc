@@ -13,7 +13,6 @@ export TERM="wezterm" # Set the terminal type: $ curl https://raw.githubusercont
 
 # PATH variables
 export PATH="$BUN_INSTALL/bin:$PATH"
-export PATH="~/Documents/Coding/Lua/lush:$PATH"
 
 function color() {
 	echo "\033[38;2;$1;$2;${3}m"
@@ -182,8 +181,8 @@ function cfg() {
 		"awesome")
 			nvim ~/.config/awesome/rc.lua
 			;;
-		"lush")
-			nvim ~/.config/lush/rc.lua
+		"lotus")
+			nvim ~/.config/lotus/rc.lua
 			;;
 		"nvim")
 			nvim ~/.config/nvim/init.lua
@@ -208,7 +207,7 @@ function cfg() {
 
 _cfg() {
 	local cur=${COMP_WORDS[COMP_CWORD]}
-	COMPREPLY=( $(compgen -W "awesome lush nvim bash picom stylua wezterm" -- $cur) )
+	COMPREPLY=( $(compgen -W "awesome lotus nvim bash picom stylua wezterm" -- $cur) )
 }
 complete -F _cfg cfg
 
@@ -220,14 +219,11 @@ cd .
 
 # Aliases
 alias i="sudo pacman -S" # Install a package
-alias img="kitty icat" # View images with Kitty
-alias dim="brightnessctl set 10%-" # Lower brightness
-alias archbtw="clear; neofetch" # I use Arch by the way
+alias img="wezterm imgcat" # View images with Kitty
 alias ls='ls --color=auto' # Add colors to ls
 alias grep='grep --color=auto' # Add colors to grep
 alias tux="ssh $tux"
 alias neofetch="neofetch --iterm2 ~/Pictures/arch.png --size 500"
-alias odstatus="journalctl --user-unit onedrive -f"
 
 export tux="ndi26@tux.cs.drexel.edu"
 

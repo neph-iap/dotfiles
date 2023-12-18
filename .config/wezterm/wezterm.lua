@@ -70,6 +70,9 @@ config.cursor_blink_rate = 500
 -- Keys
 config.keys = {
 	{ key = "v", mods = "CTRL", action = wezterm.action.PasteFrom("Clipboard") },
+	{ key = "w", mods = "CTRL", action = wezterm.action.CloseCurrentTab({ confirm = true }) },
+	{ key = "t", mods = "CTRL", action = wezterm.action.SpawnTab("CurrentPaneDomain") },
+	{ key = "C", mods = "CTRL", action = wezterm.action.CopyTo("Clipboard") },
 }
 
 return config

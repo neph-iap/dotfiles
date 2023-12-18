@@ -1,0 +1,26 @@
+prompt = "> "
+editor = nvim
+
+function cfg(app)
+	local config_files = {
+		awesome = "/home/neph/.config/awesome/rc.lua",
+		bash = "/home/neph/.bashrc",
+		lush = "/home/neph/.config/lush/rc.lua",
+		nvim = "/home/neph/.config/nvim/init.lua",
+		wezterm = "/home/neph/.config/wezterm/wezterm.lua",
+	}
+
+	if config_files[app] then
+		editor(config_files[app])
+	else
+		print("Unknown app: " .. app)
+	end
+end
+
+-- Aliases
+function i(package_name) sudo.pacman("-S", package_name) end
+function img(image_name) wezterm("imgcat", image_name) end
+function grep(pattern) command("grep", { color = "auto" }, pattern) end
+function tux() ssh("ndi26@tux.cs.drexel.edu") end
+function ls(flags) command("ls", { color = "auto" }, flags) end
+function neofetch() command("neofetch", { ["iterm2"] = "~/Pictures/arch.png", size = 500 }) end

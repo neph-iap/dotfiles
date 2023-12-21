@@ -205,7 +205,7 @@ function sidebar:refresh_numbers()
 
 	local battery_icon_text = battery_icons[math.floor(battery_percentage / 10.0) + 1]
 
-	local battery_icon = wibox.widget.textclock(is_charging and "  󰂉" or "  " .. battery_icon_text .. " ")
+	local battery_icon = wibox.widget.textclock(is_charging and "  󰂉" or "  " .. battery_icon_text)
 	battery_icon.font = "OpenSans 20"
 
 	local battery = wibox.widget({

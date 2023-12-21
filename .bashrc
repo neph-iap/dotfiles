@@ -13,6 +13,7 @@ export TERM="wezterm" # Set the terminal type: $ curl https://raw.githubusercont
 
 # PATH variables
 export PATH="$BUN_INSTALL/bin:$PATH"
+export PATH="$PATH:/home/neph/.local/bin"
 
 function color() {
 	echo "\033[38;2;$1;$2;${3}m"
@@ -182,7 +183,7 @@ function cfg() {
 			nvim ~/.config/awesome/rc.lua
 			;;
 		"lotus")
-			nvim ~/.config/lotus/rc.lua
+			nvim ~/.config/lotus/rc.lotus
 			;;
 		"nvim")
 			nvim ~/.config/nvim/init.lua
@@ -241,6 +242,11 @@ function c() {
 	gcc -o "$fname" "$fname.c"
 	./"$fname"
 	rm "$fname"
+}
+
+function clean() {
+	paccache -rk1
+	paccache -ruk0
 }
 
 # Set tab size

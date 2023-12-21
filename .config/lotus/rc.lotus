@@ -1,11 +1,21 @@
 prompt = "> "
-editor = nvim
 
+local editor = nvim
+
+-- Aliases
+function i(...) sudo.pacman({ "S" }, ...) end
+function img(...) wezterm.imgcat(...) end
+function grep() command.grep({ color = "auto" }, ...) end
+function tux() ssh($tux) end
+function ls(...) ls({ color = "auto" }, ...) end
+function neofetch(...) neofetch({ ["iterm2"] = "~/Pictures/arch.png", size = 500 }, ...) end
+
+-- Configuration
 function cfg(app)
 	local config_files = {
 		awesome = "/home/neph/.config/awesome/rc.lua",
 		bash = "/home/neph/.bashrc",
-		lush = "/home/neph/.config/lush/rc.lua",
+		lotus = "/home/neph/.config/lotus/rc.lotus",
 		nvim = "/home/neph/.config/nvim/init.lua",
 		wezterm = "/home/neph/.config/wezterm/wezterm.lua",
 	}
@@ -13,14 +23,28 @@ function cfg(app)
 	if config_files[app] then
 		editor(config_files[app])
 	else
-		print("Unknown app: " .. app)
+		print(`Unknown app: {app}`)
 	end
 end
 
--- Aliases
-function i(package_name) sudo.pacman("-S", package_name) end
-function img(image_name) wezterm("imgcat", image_name) end
-function grep(pattern) command("grep", { color = "auto" }, pattern) end
-function tux() ssh("ndi26@tux.cs.drexel.edu") end
-function ls(flags) command("ls", { color = "auto" }, flags) end
-function neofetch() command("neofetch", { ["iterm2"] = "~/Pictures/arch.png", size = 500 }) end
+-- Custom cd
+function cd(path)
+	builtin.cd(path)
+	clear()
+
+	print(`┏━ {$PWD}:`)
+	print("┃")
+
+	local files = ls({"p", "v"}) |> grep("/", { "v" }) |> $() |> lotus.string.lines()
+	local directories = ls({"p", "v"}) |> grep("/") |> $() |> lotus.string.lines()
+
+	for directory in directories do
+		directory_icon = get_icon(directory)
+		print(`┃ {directory_icon} {directory}`)
+	end
+
+	for file in files do
+		file_icon = get_icon(file)
+		print(`┃ {file_icon} {file}`)
+	end
+end

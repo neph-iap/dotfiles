@@ -28,6 +28,7 @@ vim.opt.termguicolors = true -- Use true color in the terminal
 -- Image.nvim - requires magick luarocks
 package.path = package.path .. ";" .. vim.fn.expand("$HOME") .. "/.luarocks/share/lua/5.1/?/init.lua;"
 package.path = package.path .. ";" .. vim.fn.expand("$HOME") .. "/.luarocks/share/lua/5.1/?.lua;"
+-- package.path = package.path .. ";" .. "/usr/lib/luarocks/rocks-5.4/luasocket/3.1.0-1"
 
 -- Enable word wrapping for text files such as markdown or text
 vim.api.nvim_create_autocmd("FileType", {
@@ -43,6 +44,7 @@ local filetypes = {
 	["*.ll"] = "llvm",
 	["*.rasi"] = "rasi",
 	["*.pest"] = "pest",
+	["*.lotus"] = "lotus",
 }
 
 for pattern, filetype in pairs(filetypes) do
@@ -195,6 +197,8 @@ require("lazy").setup(
 							".luarc.json",
 							"pyproject.toml",
 							"build.zig",
+							"LICENSE",
+							"index.html",
 							"src",
 						}
 
@@ -365,89 +369,184 @@ require("lazy").setup(
 				"neovim/nvim-lspconfig", -- LSP Configuration
 			},
 			config = function()
-				require("lspconfig").rust_analyzer.setup({
-					settings = {
-						["rust-analyzer"] = {
-							checkOnSave = {
-								allFeatures = true,
-								-- stylua: ignore start
-								overrideCommand = {
-									-- Run clippy linting on save
-									"cargo",
-									"clippy",
-									"--workspace",
-									"--message-format=json",
-									"--all-targets",
-									"--all-features",
-									"--",
+				local mode = "dev"
 
-									-- Warnings: Enable Clippy to warn on all of the following groups:
-									"-W", "clippy::pedantic", -- Very technical and just pedantic lints
-									"-W", "clippy::nursery", -- Lints that have not yet been stabilized/made it into production clippy
-									"-W", "clippy::cargo", -- Lints from the cargo command
-									"-W", "clippy::correctness", -- Lints to check for code that is likely incorrect
-									"-W", "clippy::perf", -- Lints for unperformant ways of doing things
-									"-W", "clippy::style", -- Lints for bad code style or consistency
-									"-W", "clippy::suspicious", -- Lints for things that you probably didn't mean to do / meant something else
+				-- Switches between dev and release mode. Release mode has more strict lints that are annoying
+				-- to deal with while developing, but are useful for production code.
+				local function switch_mode()
+					if mode == "dev" then
+						mode = "release"
+						require("lspconfig").rust_analyzer.setup({
+							settings = {
+								["rust-analyzer"] = {
+									checkOnSave = {
+										allFeatures = true,
+										-- stylua: ignore start
+										overrideCommand = {
+											-- Run clippy linting on save
+											"cargo",
+											"clippy",
+											"--workspace",
+											"--message-format=json",
+											"--all-targets",
+											"--all-features",
+											"--",
 
-									-- And enable these specific restrictive warnings
-									"-W", "clippy::allow_attributes_without_reason", -- Warnings that are ignored for no reason
-									"-W", "clippy::create_dir", -- create_dir instead of create_dir_all to create intermediate directories
-									"-W", "clippy::deref_by_slicing", -- Slicing when dereferencing achieves the same
-									"-W", "clippy::empty_structs_with_brackets", -- Empty structs with needless brackets instead of a semicolon
-									"-W", "clippy::exit", -- Using the exit function at all
-									"-W", "clippy::float_cmp_const", -- Comparing a float to a constant, which is subject to floating point precision
-									"-W", "clippy::fn_to_numeric_cast_any", -- Casting a function pointer to a number
-									"-W", "clippy::if_then_some_else_none", -- If-else's that could be written with bool::then
-									"-W", "clippy::impl_trait_in_params", -- Using impl trait in parmeter instead of generic
-									"-W", "clippy::indexing_slicing", -- Indexing or slicing which may panic instead of .get() which returns an option
-									"-W", "clippy::integer_division", -- Dividing two integers without casting them to floats
-									"-W", "clippy::let_underscore_must_use", -- Not using a value from a function marked as must_use
-									"-W", "clippy::lossy_float_literal", -- Precision loss in floats
-									"-W", "clippy::map_err_ignore", -- map_err() calls that discard the original error
-									"-W", "clippy::mem_forget", -- Using mem::forget when the parameter implements Drop, meaning Drop isn't called
-									"-W", "clippy::missing_assert_message", -- Asserting without an error message
-									"-W", "clippy::missing_docs_in_private_items", -- Missing documentation comments
-									"-W", "clippy::missing_enforced_import_renames", -- Missing import renames that are enforced
-									"-W", "clippy::mixed_read_write_in_expression", -- Reading and writing a variable in the same expression which may cause confusion
-									"-W", "clippy::multiple_inherent_impl", -- Multiple non-trait impls for the same struct
-									"-W", "clippy::mutex_atomic", -- Using a Mutex when an Atomic will do the job
-									"-W", "clippy::panic", -- Using the panic! macro
-									"-W", "clippy::panic_in_result_fn", -- Using the panic! macro when a function returns a Result
-									"-W", "clippy::print_stderr", -- Printing to stderr (should not be present in production code)
-									"-W", "clippy::rc_mutex", -- Using Rc<Mutex>, in which Rc is not thread save but Mutex is
-									"-W", "clippy::rest_pat_in_fully_bound_structs", -- Using a rest (..) pattern on a fully matched struct
-									"-W", "clippy::same_name_method", -- Two methods with the same name on a struct due to traits
-									"-W", "clippy::semicolon_outside_block", -- Semicolons that are placed inside of blocks (such as unsafe) instead of outside
-									"-W", "clippy::shadow_reuse", -- Shadowing a variable to reuse it
-									"-W", "clippy::shadow_same", -- Shadowing a variable with one with the same name
-									"-W", "clippy::shadow_unrelated", -- Shadowing a variable and using it in an unrelated context
-									"-W", "clippy::single_char_lifetime_names", -- Lifetime parameter names that are a single character (nondescriptive)
-									"-W", "clippy::string_to_string", -- Converting a String to itself with .to_string()
-									"-W", "clippy::suspicious_xor_used_as_pow", -- Using a XOR where pow() was probably intended
-									"-W", "clippy::tests_outside_test_module", -- Using test functions outside of a module marked #[cfg(test)]
-									"-W", "clippy::todo", -- The todo! macro (shouldn't be present in production code)
-									"-W", "clippy::unimplemented", -- The unimplemented! macro (shouldn't be present in production code)
-									"-W", "clippy::unnecessary_safety_comment", -- Safety comments on inherently safe operations
-									"-W", "clippy::unnecessary_safety_doc", -- Safety documentation on inherently safe functions
-									"-W", "clippy::unnecessary_self_imports", -- Unnecessarily importing "self" which does nothing
-									"-W", "clippy::unneeded_field_pattern", -- Unnecessary fields in pattern matching instead of resting (..)
-									"-W", "clippy::unreachable", -- The unreachable! macro (shouldn't be present in production code)
-									"-W", "clippy::use_debug", -- Using the dbg! macro (shouldn't be present in production code)
-									"-W", "clippy::verbose_file_reads", -- Reading a file with File::read_to or File::read_to_string instead of std::fs::read_to_string()
+											-- Warnings: Enable Clippy to warn on all of the following groups:
+											"-W", "clippy::pedantic", -- Very technical and just pedantic lints
+											"-W", "clippy::nursery", -- Lints that have not yet been stabilized/made it into production clippy
+											"-W", "clippy::cargo", -- Lints from the cargo command
+											"-W", "clippy::correctness", -- Lints to check for code that is likely incorrect
+											"-W", "clippy::perf", -- Lints for unperformant ways of doing things
+											"-W", "clippy::style", -- Lints for bad code style or consistency
+											"-W", "clippy::suspicious", -- Lints for things that you probably didn't mean to do / meant something else
 
-									-- BUT allow these that I deem stupid
-									"-A", "clippy::multiple_crate_versions", -- Multiple versions of a dependency crate
-									"-A", "clippy::module_name_repetitions", -- Repeating module name in identifiers
-									"-A", "clippy::cast_precision_loss", -- Casting between numeric types where precision may be lost (such as an i32 to an i16)
-									"-A", "clippy::cast_lossless",
+											-- And enable these specific restrictive warnings
+											"-W", "clippy::allow_attributes_without_reason", -- Warnings that are ignored for no reason
+											"-W", "clippy::create_dir", -- create_dir instead of create_dir_all to create intermediate directories
+											"-W", "clippy::deref_by_slicing", -- Slicing when dereferencing achieves the same
+											"-W", "clippy::empty_structs_with_brackets", -- Empty structs with needless brackets instead of a semicolon
+											"-W", "clippy::exit", -- Using the exit function at all
+											"-W", "clippy::float_cmp_const", -- Comparing a float to a constant, which is subject to floating point precision
+											"-W", "clippy::fn_to_numeric_cast_any", -- Casting a function pointer to a number
+											"-W", "clippy::if_then_some_else_none", -- If-else's that could be written with bool::then
+											"-W", "clippy::impl_trait_in_params", -- Using impl trait in parmeter instead of generic
+											"-W", "clippy::indexing_slicing", -- Indexing or slicing which may panic instead of .get() which returns an option
+											"-W", "clippy::integer_division", -- Dividing two integers without casting them to floats
+											"-W", "clippy::let_underscore_must_use", -- Not using a value from a function marked as must_use
+											"-W", "clippy::lossy_float_literal", -- Precision loss in floats
+											"-W", "clippy::map_err_ignore", -- map_err() calls that discard the original error
+											"-W", "clippy::mem_forget", -- Using mem::forget when the parameter implements Drop, meaning Drop isn't called
+											"-W", "clippy::missing_assert_message", -- Asserting without an error message
+											"-W", "clippy::missing_docs_in_private_items", -- Missing documentation comments
+											"-W", "clippy::missing_enforced_import_renames", -- Missing import renames that are enforced
+											"-W", "clippy::mixed_read_write_in_expression", -- Reading and writing a variable in the same expression which may cause confusion
+											"-W", "clippy::multiple_inherent_impl", -- Multiple non-trait impls for the same struct
+											"-W", "clippy::mutex_atomic", -- Using a Mutex when an Atomic will do the job
+											"-W", "clippy::panic", -- Using the panic! macro
+											"-W", "clippy::panic_in_result_fn", -- Using the panic! macro when a function returns a Result
+											"-W", "clippy::print_stderr", -- Printing to stderr (should not be present in production code)
+											"-W", "clippy::rc_mutex", -- Using Rc<Mutex>, in which Rc is not thread save but Mutex is
+											"-W", "clippy::rest_pat_in_fully_bound_structs", -- Using a rest (..) pattern on a fully matched struct
+											"-W", "clippy::same_name_method", -- Two methods with the same name on a struct due to traits
+											"-W", "clippy::semicolon_outside_block", -- Semicolons that are placed inside of blocks (such as unsafe) instead of outside
+											"-W", "clippy::shadow_reuse", -- Shadowing a variable to reuse it
+											"-W", "clippy::shadow_same", -- Shadowing a variable with one with the same name
+											"-W", "clippy::shadow_unrelated", -- Shadowing a variable and using it in an unrelated context
+											"-W", "clippy::single_char_lifetime_names", -- Lifetime parameter names that are a single character (nondescriptive)
+											"-W", "clippy::string_to_string", -- Converting a String to itself with .to_string()
+											"-W", "clippy::suspicious_xor_used_as_pow", -- Using a XOR where pow() was probably intended
+											"-W", "clippy::tests_outside_test_module", -- Using test functions outside of a module marked #[cfg(test)]
+											"-W", "clippy::todo", -- The todo! macro (shouldn't be present in production code)
+											"-W", "clippy::unimplemented", -- The unimplemented! macro (shouldn't be present in production code)
+											"-W", "clippy::unnecessary_safety_comment", -- Safety comments on inherently safe operations
+											"-W", "clippy::unnecessary_safety_doc", -- Safety documentation on inherently safe functions
+											"-W", "clippy::unnecessary_self_imports", -- Unnecessarily importing "self" which does nothing
+											"-W", "clippy::unneeded_field_pattern", -- Unnecessary fields in pattern matching instead of resting (..)
+											"-W", "clippy::unreachable", -- The unreachable! macro (shouldn't be present in production code)
+											"-W", "clippy::use_debug", -- Using the dbg! macro (shouldn't be present in production code)
+											"-W", "clippy::verbose_file_reads", -- Reading a file with File::read_to or File::read_to_string instead of std::fs::read_to_string()
 
-									-- stylua: ignore end
+											-- BUT allow these that I deem stupid
+											"-A", "clippy::multiple_crate_versions", -- Multiple versions of a dependency crate
+											"-A", "clippy::module_name_repetitions", -- Repeating module name in identifiers
+											"-A", "clippy::cast_precision_loss", -- Casting between numeric types where precision may be lost (such as an i32 to an i16)
+											"-A", "clippy::cast_lossless",
+
+											-- stylua: ignore end
+										},
+									},
 								},
 							},
-						},
-					},
-				})
+						})
+					else
+						mode = "dev"
+						require("lspconfig").rust_analyzer.setup({
+							settings = {
+								["rust-analyzer"] = {
+									checkOnSave = {
+										allFeatures = true,
+										-- stylua: ignore start
+										overrideCommand = {
+											-- Run clippy linting on save
+											"cargo",
+											"clippy",
+											"--workspace",
+											"--message-format=json",
+											"--all-targets",
+											"--all-features",
+											"--",
+
+											-- Warnings: Enable Clippy to warn on all of the following groups:
+											"-W", "clippy::pedantic", -- Very technical and just pedantic lints
+											"-W", "clippy::nursery", -- Lints that have not yet been stabilized/made it into production clippy
+											"-W", "clippy::cargo", -- Lints from the cargo command
+											"-W", "clippy::correctness", -- Lints to check for code that is likely incorrect
+											"-W", "clippy::perf", -- Lints for unperformant ways of doing things
+											"-W", "clippy::style", -- Lints for bad code style or consistency
+											"-W", "clippy::suspicious", -- Lints for things that you probably didn't mean to do / meant something else
+
+											-- And enable these specific restrictive warnings
+											"-W", "clippy::allow_attributes_without_reason", -- Warnings that are ignored for no reason
+											"-W", "clippy::create_dir", -- create_dir instead of create_dir_all to create intermediate directories
+											"-W", "clippy::deref_by_slicing", -- Slicing when dereferencing achieves the same
+											"-W", "clippy::empty_structs_with_brackets", -- Empty structs with needless brackets instead of a semicolon
+											"-W", "clippy::exit", -- Using the exit function at all
+											"-W", "clippy::float_cmp_const", -- Comparing a float to a constant, which is subject to floating point precision
+											"-W", "clippy::fn_to_numeric_cast_any", -- Casting a function pointer to a number
+											"-W", "clippy::if_then_some_else_none", -- If-else's that could be written with bool::then
+											"-W", "clippy::impl_trait_in_params", -- Using impl trait in parmeter instead of generic
+											"-W", "clippy::indexing_slicing", -- Indexing or slicing which may panic instead of .get() which returns an option
+											"-W", "clippy::integer_division", -- Dividing two integers without casting them to floats
+											"-W", "clippy::let_underscore_must_use", -- Not using a value from a function marked as must_use
+											"-W", "clippy::lossy_float_literal", -- Precision loss in floats
+											"-W", "clippy::map_err_ignore", -- map_err() calls that discard the original error
+											"-W", "clippy::mem_forget", -- Using mem::forget when the parameter implements Drop, meaning Drop isn't called
+											"-W", "clippy::missing_assert_message", -- Asserting without an error message
+											"-W", "clippy::missing_enforced_import_renames", -- Missing import renames that are enforced
+											"-W", "clippy::mixed_read_write_in_expression", -- Reading and writing a variable in the same expression which may cause confusion
+											"-W", "clippy::multiple_inherent_impl", -- Multiple non-trait impls for the same struct
+											"-W", "clippy::mutex_atomic", -- Using a Mutex when an Atomic will do the job
+											"-W", "clippy::panic", -- Using the panic! macro
+											"-W", "clippy::panic_in_result_fn", -- Using the panic! macro when a function returns a Result
+											"-W", "clippy::print_stderr", -- Printing to stderr (should not be present in production code)
+											"-W", "clippy::rc_mutex", -- Using Rc<Mutex>, in which Rc is not thread safe but Mutex is
+											"-W", "clippy::rest_pat_in_fully_bound_structs", -- Using a rest (..) pattern on a fully matched struct
+											"-W", "clippy::same_name_method", -- Two methods with the same name on a struct due to traits
+											"-W", "clippy::semicolon_outside_block", -- Semicolons that are placed inside of blocks (such as unsafe) instead of outside
+											"-W", "clippy::shadow_reuse", -- Shadowing a variable to reuse it
+											"-W", "clippy::shadow_same", -- Shadowing a variable with one with the same name
+											"-W", "clippy::shadow_unrelated", -- Shadowing a variable and using it in an unrelated context
+											"-W", "clippy::string_to_string", -- Converting a String to itself with .to_string()
+											"-W", "clippy::suspicious_xor_used_as_pow", -- Using a XOR where pow() was probably intended
+											"-W", "clippy::tests_outside_test_module", -- Using test functions outside of a module marked #[cfg(test)]
+											"-W", "clippy::todo", -- The todo! macro (shouldn't be present in production code)
+											"-W", "clippy::unimplemented", -- The unimplemented! macro (shouldn't be present in production code)
+											"-W", "clippy::unnecessary_safety_comment", -- Safety comments on inherently safe operations
+											"-W", "clippy::unnecessary_safety_doc", -- Safety documentation on inherently safe functions
+											"-W", "clippy::unnecessary_self_imports", -- Unnecessarily importing "self" which does nothing
+											"-W", "clippy::unneeded_field_pattern", -- Unnecessary fields in pattern matching instead of resting (..)
+											"-W", "clippy::unreachable", -- The unreachable! macro (shouldn't be present in production code)
+											"-W", "clippy::use_debug", -- Using the dbg! macro (shouldn't be present in production code)
+											"-W", "clippy::verbose_file_reads", -- Reading a file with File::read_to or File::read_to_string instead of std::fs::read_to_string()
+
+											-- BUT allow these that I deem stupid
+											"-A", "clippy::multiple_crate_versions", -- Multiple versions of a dependency crate
+											"-A", "clippy::module_name_repetitions", -- Repeating module name in identifiers
+											"-A", "clippy::cast_precision_loss", -- Casting between numeric types where precision may be lost (such as an i32 to an i16)
+											"-A", "clippy::cast_lossless",
+
+											-- stylua: ignore end
+										},
+									},
+								},
+							},
+						})
+					end
+					print("Switched to " .. mode .. " mode")
+				end
+
+				vim.keymap.set("n", "<leader>lm", switch_mode, { silent = true })
 			end,
 			ft = "rust",
 		},
@@ -533,12 +632,17 @@ require("lazy").setup(
 			end,
 		},
 
+		-- Todo diagnostic list
+		{
+			"folke/trouble.nvim",
+			cmd = "TodoTrouble",
+		},
+
 		-- Highlight comments with  TODO: in them such as this, as well as FIXME and others, also creates a list of them
 		{
 			"folke/todo-comments.nvim",
 			dependencies = {
 				"nvim-lua/plenary.nvim",
-				{ "folke/trouble.nvim", cmd = "TodoTrouble" },
 			},
 			opts = {},
 		},
@@ -646,6 +750,25 @@ require("lazy").setup(
 			},
 		},
 
+		-- Autocomplete
+		{
+			"hrsh7th/nvim-cmp",
+			dependencies = {
+				"hrsh7th/cmp-cmdline", -- Autocomplete in command line
+				"hrsh7th/cmp-buffer", -- Autocomplete for the buffer
+				"hrsh7th/cmp-path", -- Autocomplete for file paths
+				"L3MON4D3/LuaSnip", -- Snippets
+				"onsails/lspkind.nvim", -- Icons in autocomplete
+			},
+			event = "InsertEnter",
+		},
+
+		-- Neovim development environment
+		{
+			"folke/neodev.nvim",
+			ft = "lua",
+		},
+
 		-- Language tool manager
 		{
 			dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/forge.nvim",
@@ -654,15 +777,8 @@ require("lazy").setup(
 				"williamboman/mason.nvim", -- LSP Installer
 				"neovim/nvim-lspconfig", -- LSP Configuration
 				"williamboman/mason-lspconfig.nvim", -- LSP Configuration for Mason
-				{ "folke/neodev.nvim", ft = "lua" }, -- Neovim development environment
-				{ "stevearc/conform.nvim", lazy = true }, -- Auto formatting
-				{ "hrsh7th/nvim-cmp", lazy = true }, -- Autocomplete
-				{ "hrsh7th/cmp-nvim-lsp", lazy = true }, -- LSP integration with autocomplete
-				{ "hrsh7th/cmp-cmdline", lazy = true }, -- Autocomplete in command line
-				{ "hrsh7th/cmp-buffer", lazy = true }, -- Autocomplete for the buffer
-				{ "hrsh7th/cmp-path", lazy = true }, -- Autocomplete for file paths
-				{ "L3MON4D3/LuaSnip", lazy = true }, -- Snippets
-				{ "onsails/lspkind.nvim", lazy = true }, -- Icons in autocomplete
+				"hrsh7th/cmp-nvim-lsp", -- LSP integration with autocomplete
+				"stevearc/conform.nvim", -- Autoformatter
 			},
 			opts = {},
 		},
@@ -786,12 +902,21 @@ require("lazy").setup(
 		-- Lotus support
 		{
 			dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/lotus.nvim",
-			opts = {},
+			ft = "lotus",
 		},
 
 		-- Cargo
 		{
 			dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/cargo.nvim",
+			dependencies = {
+				{
+					"theHamsta/nvim_rocks",
+					build = "pipx install hererocks && hererocks . -j2.1.0-beta3 -r3.0.0 && cp nvim_rocks.lua lua",
+				},
+				"stevearc/dressing.nvim",
+			},
+			ft = { "rust", "toml" },
+			cmd = { "AddCrate" },
 			opts = {},
 		},
 	},

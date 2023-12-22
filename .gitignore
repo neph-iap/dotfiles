@@ -28,3 +28,10 @@
 !.config/onedrive
 .config/onedrive/*
 !.config/onedrive/config
+
+# XDG
+!.local/
+.local/*
+!.local/share/
+.local/share/*
+!.local/share/applications/

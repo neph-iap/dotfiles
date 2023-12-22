@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=GThumb
+GenericName=Photo Manager
+Exec=/usr/bin/gthumb %F
+MimeType=image/jpg;image/png;img/webp;img/gif;
+Type=Application
+Icon=gthumb
+Terminal=false
+Categories=Graphics;Viewer;GTK;
+Actions=View;Edit;Rotate;Fullscreen;SetAsBackground;Slideshow;

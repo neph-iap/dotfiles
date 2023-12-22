@@ -64,11 +64,20 @@ awful.widget.watch("cat /sys/class/power_supply/BAT0/capacity", 1, function(_, s
 		})
 		gave_20_warning = true
 	end
+
 	if not gave_10_warning and tonumber(stdout) <= 10 then
 		naughty.notify({
 			title = "Battery",
 			text = "Warning: Battery is critical (" .. stdout:gsub("\n$", "") .. "%)",
 		})
 		gave_10_warning = true
+	end
+
+	if tonumber(stdout) > 10 then
+		gave_10_warning = false
+	end
+
+	if tonumber(stdout) > 20 then
+		gave_20_warning = false
 	end
 end)

@@ -14,6 +14,7 @@ export TERM="wezterm" # Set the terminal type: $ curl https://raw.githubusercont
 # PATH variables
 export PATH="$BUN_INSTALL/bin:$PATH"
 export PATH="$PATH:/home/neph/.local/bin"
+export PATH="$PATH:/home/neph/Documents/Coding/Desktop Apps/honey/src-tauri/target/release"
 
 function color() {
 	echo "\033[38;2;$1;$2;${3}m"

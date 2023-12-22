@@ -91,6 +91,7 @@ client.connect_signal("manage", function(c)
 	if awesome.startup and not c.size_hints.user_position and not c.size_hints.program_position then
 		awful.placement.no_offscreen(c) -- Prevent clients from being unreachable after screen count changes.
 	end
+	awful.placement.centered(c)
 end)
 
 awful.spawn("picom -b --config " .. os.getenv("HOME") .. "/.config/picom/picom.conf")

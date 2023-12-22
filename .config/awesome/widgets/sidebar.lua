@@ -244,26 +244,38 @@ function sidebar:refresh_numbers()
 	local disk_text = wibox.widget.textclock(tostring(disk_usage) .. "%%")
 	disk_text.font = "OpenSans 15"
 
-	local cpu_temperature_icon = wibox.widget.textclock("  ")
-	cpu_temperature_icon.font = "OpenSans 20"
+	local calculator_icon = wibox.widget.textclock("󰃬")
+	calculator_icon.font = "OpenSans 32"
+	calculator_icon:connect_signal("button::press", function()
+		awful.spawn(preferences.apps.calculator)
+		sidebar.visible = false
+	end)
 
-	local cpu_temperature = math.floor(9 / 5 * tonumber(io.popen("cat /sys/class/thermal/thermal_zone2/temp"):read("a")) / 1000 + 32)
+	local files_icon = wibox.widget.textclock("󰉋")
+	files_icon.font = "OpenSans 32"
+	files_icon:connect_signal("button::press", function()
+		awful.spawn(preferences.apps.file_explorer)
+		sidebar:toggle()
+	end)
 
-	local cpu_temperature_widget = wibox.widget({
-		max_value = 176,
-		value = cpu_temperature - 72,
-		forced_height = 20,
-		forced_width = 300,
-		margins = { right = 25, left = 25 },
-		color = theme.custom.primary_foreground,
-		shape = gears.shape.rounded_bar,
-		background_color = theme.custom.secondary_foreground,
-		widget = wibox.widget.progressbar,
-		bar_shape = gears.shape.rounded_bar,
-	})
+	local camera_icon = wibox.widget.textclock("󰸗")
+	camera_icon.font = "OpenSans 32"
 
-	local cpu_temperature_text = wibox.widget.textclock(tostring(cpu_temperature) .. "°")
-	cpu_temperature_text.font = "OpenSans 15"
+	local mail_icon = wibox.widget.textclock("󰇮")
+	mail_icon.font = "OpenSans 32"
+
+	local apps = {
+		{
+			calculator_icon,
+			files_icon,
+			camera_icon,
+			mail_icon,
+			spacing = 50,
+			layout = wibox.layout.fixed.horizontal,
+		},
+		widget = wibox.container.margin,
+		left = 25,
+	}
 
 	sidebar:setup({
 		{
@@ -294,17 +306,16 @@ function sidebar:refresh_numbers()
 						layout = wibox.layout.fixed.horizontal,
 					},
 					{ disk_icon, disk_usage_widget, disk_text, layout = wibox.layout.fixed.horizontal },
-					{
-						cpu_temperature_icon,
-						cpu_temperature_widget,
-						cpu_temperature_text,
-						layout = wibox.layout.fixed.horizontal,
-					},
 					layout = wibox.layout.fixed.vertical,
 					spacing = 25,
 				},
 				layout = wibox.layout.fixed.vertical,
-				spacing = 50,
+				spacing = 25,
+			},
+			{
+				apps,
+				widget = wibox.container.margin,
+				top = 25,
 			},
 			widget = wibox.container.background,
 			forced_width = 400,

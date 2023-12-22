@@ -52,10 +52,10 @@ function public.setup(widgets)
 		awful.key({ modkey }, "Right", f(awful.tag.viewnext), { description = "view next", group = "tag" }),
 
 		-- Launch Programs
-		awful.key({ modkey }, "r", f(function() awful.spawn(os.getenv("HOME") .. "/.config/rofi/launchers/type-3/launcher.sh") end), { description = "run prompt", group = "launcher" }),
-		awful.key({ modkey }, "Return", f(function() awful.spawn("wezterm") end), { description = "open a terminal", group = "launcher" }),
-		awful.key({ modkey, "Shift" }, "f", f(function() awful.spawn("firefox") end), { description = "Open firefox", group = "launcher" }),
-		awful.key({ modkey, "Shift" }, "d", f(function() awful.spawn("discord") end), { description = "Open discord", group = "launcher" }),
+		awful.key({ modkey }, "r", f(function() awful.spawn(os.getenv("HOME") .. "/.config/rofi/launchers/type-3/launcher.sh") end)),
+		awful.key({ modkey }, "Return", f(function() awful.spawn("wezterm") end)),
+		awful.key({ modkey, "Shift" }, "f", f(function() awful.spawn("librewolf") end)),
+		awful.key({ modkey, "Shift" }, "d", f(function() awful.spawn("discord") end)),
 		awful.key({ modkey, "Shift" }, "s", f(function() awful.spawn("flameshot gui") end)),
 
 		-- Awesome Core Functions

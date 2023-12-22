@@ -576,7 +576,7 @@ require("lazy").setup(
 			},
 			opts = {},
 			keys = {
-				{ "<leader>m", "<cmd>IconPickerNormal nerd_font_v3 alt_font symbols<cr>", desc = "Insert Symbols" },
+				{ "<leader>m", "<cmd>IconPickerNormal nerd_font_v3 alt_font symbols emoji<cr>", desc = "Insert Symbols" },
 			},
 		},
 

@@ -248,7 +248,7 @@ function sidebar:refresh_numbers()
 	calculator_icon.font = "OpenSans 32"
 	calculator_icon:connect_signal("button::press", function()
 		awful.spawn(preferences.apps.calculator)
-		sidebar.visible = false
+		sidebar:toggle()
 	end)
 
 	local files_icon = wibox.widget.textclock("󰉋")
@@ -258,8 +258,8 @@ function sidebar:refresh_numbers()
 		sidebar:toggle()
 	end)
 
-	local camera_icon = wibox.widget.textclock("󰸗")
-	camera_icon.font = "OpenSans 32"
+	local calendar_icon = wibox.widget.textclock("󰸗")
+	calendar_icon.font = "OpenSans 32"
 
 	local mail_icon = wibox.widget.textclock("󰇮")
 	mail_icon.font = "OpenSans 32"
@@ -268,7 +268,7 @@ function sidebar:refresh_numbers()
 		{
 			calculator_icon,
 			files_icon,
-			camera_icon,
+			calendar_icon,
 			mail_icon,
 			spacing = 50,
 			layout = wibox.layout.fixed.horizontal,

@@ -128,6 +128,9 @@ local function workspace_button(c, tag_number)
 
 	widget:connect_signal("button::press", function()
 		c:move_to_tag(client.focus.screen.tags[tag_number])
+		for _, some_client in ipairs(client.get()) do
+			some_client:emit_signal("request::titlebars")
+		end
 	end)
 
 	return {
@@ -135,6 +138,34 @@ local function workspace_button(c, tag_number)
 		widget = wibox.container.margin,
 		right = 7,
 	}
+end
+
+local function layout_widget()
+	local current_tag = awful.tag.selected(1)
+
+	local current_layout = tostring(current_tag.layout.name)
+	local current_layout_color = "#FFFFFF"
+
+	if current_layout == "tile" then
+		current_layout = "﩯"
+		current_layout_color = "#00FFAA"
+	elseif current_layout == "floating" then
+		current_layout = "󰅟"
+		current_layout_color = "#00AAFF"
+	end
+
+	local layout = wibox.widget.textbox(('<span color="%s">%s</span>'):format(current_layout_color, current_layout))
+	layout.font = "OpenSans 15"
+
+	layout:connect_signal("button::press", function()
+		awful.layout.inc(1)
+
+		for _, c in ipairs(client.get()) do
+			c:emit_signal("request::titlebars")
+		end
+	end)
+
+	return layout
 end
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
@@ -179,8 +210,10 @@ client.connect_signal("request::titlebars", function(c)
 		-- Right
 		{
 			{
+				layout_widget(),
 				close_button(c),
 				layout = wibox.layout.fixed.horizontal(),
+				spacing = 10,
 			},
 			widget = wibox.container.margin,
 			right = 10,

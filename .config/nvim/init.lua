@@ -949,8 +949,8 @@ require("lazy").setup(
 					local current_directory = vim.fn.expand("%:p:h")
 					local root_directory = current_directory
 					local is_root, filetype = is_root_dir(root_directory)
-					while not is_root do
-						root_directory = vim.fn.fnamemodify(root_directory, ":h")
+					while not (is_root or root_directory == os.getenv("HOME")) do
+						root_directory = vim.fn.fnamemodify(root_directory, ":h") -- Set to parent dir
 						if root_directory == os.getenv("HOME") then
 							root_directory = current_directory
 							break
@@ -962,7 +962,14 @@ require("lazy").setup(
 				end
 
 				local filetype, root_directory = get_project_type()
+
 				local icon, color = require("nvim-web-devicons").get_icon_color("example", filetype)
+				if not icon then
+					icon = "*"
+				end
+				if not color then
+					color = "#ffffff"
+				end
 
 				local last_dir = root_directory:sub(root_directory:find("/[^/]*$") + 1, root_directory:len())
 				local special_directories = {
@@ -989,7 +996,7 @@ require("lazy").setup(
 								text_align = "left",
 							},
 						},
-						separator_style = { " ", " " },
+						separator_style = { "", "" },
 						show_buffer_close_icons = false,
 						show_close_icon = false,
 					},
@@ -1015,7 +1022,7 @@ require("lazy").setup(
 					},
 				})
 			end,
-			event = "VeryLazy",
+			event = "VeryLazy", -- Required after NeoTreeNormal highlight group is loaded
 		},
 	},
 

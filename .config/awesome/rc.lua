@@ -30,16 +30,6 @@ local brightness_bar = require("widgets.brightness")
 local dock = require("widgets.dock")
 local launcher = require("widgets.launcher")
 
-menu.setup({
-	sidebar = sidebar.widget,
-	menu = menu.widget,
-	tags = tags.widget,
-	volume = volume_bar.widget,
-	brightness = brightness_bar.widget,
-	dock = dock.widget,
-	launcher = launcher.widget,
-})
-
 require("widgets.notification")
 
 -- Initialize hotkeys

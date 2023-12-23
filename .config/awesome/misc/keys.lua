@@ -9,6 +9,10 @@ local other_key_was_pressed = false
 
 -- Returns a function that notes that an action was done, and then calls the action given to it.
 -- Used to make sure the start menu doesn't open when other actions are called.
+--
+---@param action function
+--
+---@return function
 local function f(action)
 	return function(...)
 		other_key_was_pressed = true

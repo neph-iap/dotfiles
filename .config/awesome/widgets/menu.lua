@@ -5,7 +5,7 @@ local theme = require("misc.theme")
 
 local public = {}
 
-local slide_speed = 100
+local slide_speed = 70
 local top = -700
 
 local menu = wibox({ visible = false, ontop = true, type = "dock", screen = screen.primary })

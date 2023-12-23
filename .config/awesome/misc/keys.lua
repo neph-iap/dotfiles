@@ -1,5 +1,6 @@
 local awful = require("awful")
 local gears = require("gears")
+local preferences = require("misc.preferences")
 
 local public = {}
 public.modkey = "Mod4"
@@ -54,9 +55,10 @@ function public.setup(widgets)
 		-- Launch Programs
 		awful.key({ modkey }, "r", f(function() awful.spawn(os.getenv("HOME") .. "/.config/rofi/launchers/type-3/launcher.sh") end)),
 		awful.key({ modkey }, "Return", f(function() awful.spawn("wezterm") end)),
-		awful.key({ modkey, "Shift" }, "f", f(function() awful.spawn("librewolf") end)),
+		awful.key({ modkey, "Shift" }, "l", f(function() awful.spawn("librewolf") end)),
 		awful.key({ modkey, "Shift" }, "d", f(function() awful.spawn("discord") end)),
 		awful.key({ modkey, "Shift" }, "s", f(function() awful.spawn("flameshot gui") end)),
+		awful.key({ modkey, "Shift" }, "c", f(function() awful.spawn(preferences.apps.calculator) end)),
 
 		-- Awesome Core Functions
 		awful.key({ modkey, "Control" }, "r", f(awesome.restart), { description = "reload awesome", group = "awesome" }),

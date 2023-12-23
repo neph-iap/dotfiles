@@ -170,7 +170,7 @@ require("lazy").setup(
 							symbols = {
 								added = "+",
 								modified = "M",
-								untracked = "U",
+								untracked = "+",
 								deleted = "󰩹",
 								renamed = "R",
 								staged = "",
@@ -919,6 +919,104 @@ require("lazy").setup(
 			cmd = { "AddCrate" },
 			opts = {},
 		},
+
+		{
+			"akinsho/bufferline.nvim",
+			dependencies = "nvim-tree/nvim-web-devicons",
+			config = function()
+				local function get_project_type()
+					-- Files that indicate the root directory
+					local root_files = {
+						["Cargo.toml"] = "rs",
+						["package.json"] = "js",
+						[".luarc.json"] = "lua",
+						["pyproject.toml"] = "py",
+						["build.zig"] = "zig",
+						["index.html"] = "html",
+					}
+
+					-- Check if the directory is the root directory
+					local function is_root_dir(dir_name)
+						for name, filetype in pairs(root_files) do
+							if vim.fn.filereadable(dir_name .. "/" .. name) == 1 or vim.fn.isdirectory(dir_name .. "/" .. name) == 1 then
+								return true, filetype
+							end
+						end
+						return false, nil
+					end
+
+					-- Locate the project root directory
+					local current_directory = vim.fn.expand("%:p:h")
+					local root_directory = current_directory
+					local is_root, filetype = is_root_dir(root_directory)
+					while not is_root do
+						root_directory = vim.fn.fnamemodify(root_directory, ":h")
+						if root_directory == os.getenv("HOME") then
+							root_directory = current_directory
+							break
+						end
+						is_root, filetype = is_root_dir(root_directory)
+					end
+
+					return filetype, root_directory
+				end
+
+				local filetype, root_directory = get_project_type()
+				local icon, color = require("nvim-web-devicons").get_icon_color("example", filetype)
+
+				local last_dir = root_directory:sub(root_directory:find("/[^/]*$") + 1, root_directory:len())
+				local special_directories = {
+					["/home/neph/.config/nvim"] = "Neovim Configuration",
+				}
+				if special_directories[root_directory] then
+					last_dir = special_directories[root_directory]
+				end
+
+				local neotree_bg = vim.api.nvim_exec("hi NeoTreeNormal", true):match("guibg=(#%S*)")
+				vim.api.nvim_set_hl(0, "CustomBufferlineOffset", { fg = color, bg = neotree_bg })
+
+				local bufferline = require("bufferline")
+				bufferline.setup({
+					options = {
+						style_preset = {
+							bufferline.style_preset.no_italic,
+						},
+						offsets = {
+							{
+								filetype = "neo-tree",
+								text = icon .. " " .. last_dir,
+								highlight = "CustomBufferlineOffset",
+								text_align = "left",
+							},
+						},
+						separator_style = { " ", " " },
+						show_buffer_close_icons = false,
+						show_close_icon = false,
+					},
+					highlights = {
+						fill = {
+							bg = neotree_bg,
+						},
+						tab = {
+							bg = neotree_bg,
+						},
+						background = {
+							bg = neotree_bg,
+						},
+						tab_close = {
+							bg = neotree_bg,
+						},
+						close_button = {
+							bg = neotree_bg,
+						},
+						close_button_visible = {
+							bg = neotree_bg,
+						},
+					},
+				})
+			end,
+			event = "VeryLazy",
+		},
 	},
 
 	-- Options for lazy.nvim
@@ -957,6 +1055,14 @@ vim.keymap.set("n", "<space>p", '"+p', {}) -- Paste to system clipboard
 vim.keymap.set("n", "j", "gj", {}) -- Move down by display line
 vim.keymap.set("n", "k", "gk", {}) -- Move up by display line
 vim.keymap.set("n", "d_", "dt_", {}) -- Delete to next underscore
+
+-- Window Movement
+vim.keymap.set("n", "<C-j>", "<C-w>j", {}) -- Move to window below
+vim.keymap.set("n", "<C-k>", "<C-w>k", {}) -- Move to window above
+vim.keymap.set("n", "<C-h>", "<C-w>h", {}) -- Move to window left
+vim.keymap.set("n", "<C-l>", "<C-w>l", {}) -- Move to window right
+vim.keymap.set("n", "<S-h>", ":BufferLineCyclePrev<CR>", {}) -- Move to next buffer
+vim.keymap.set("n", "<S-l>", ":BufferLineCycleNext<CR>", {}) -- Move to previous buffer
 
 -- Lsp Mappings
 vim.keymap.set("n", "<leader>fr", ":Forge<CR>", { silent = true }) -- Open Forge.nvim

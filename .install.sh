@@ -20,7 +20,7 @@ rm -rf yay
 
 # Install packages
 echo "Installing packages..."
-pacman -S neofetch neovim wezterm onefetch lightdm lightdm-webkit2-greeter lightdm-webkit-theme-litarvan luarocks lua man-pages man-db nodejs networkmanager npm unzip upower ueberzugpp obs-studio clang flameshot feh accountsservice pamixer imagemagick
+pacman -S neofetch neovim wezterm onefetch lightdm lightdm-webkit2-greeter lightdm-webkit-theme-litarvan luarocks lua man-pages man-db nodejs networkmanager npm unzip upower ueberzugpp obs-studio clang flameshot feh accountsservice pamixer imagemagick brightnessctl
 yay -S joshuto onedrive-abraunegg discord librewolf-bin
 
 # Install configuration
@@ -28,6 +28,14 @@ echo "Installing configuration..."
 git clone https://github.com/neph-iap/dotfiles.git
 cd dotfiles
 cp -R * ~/
+
+# Configure xdg defaults
+echo "Configuring xdg-open defaults..."
+xdg-mime default gthumb.desktop image/jpeg
+xdg-mime default gthumb.desktop image/png
+xdg-mime default gthumb.desktop image/jpg
+xdg-mime default gthumb.desktop image/gif
+xdg-mime default gthumb.desktop image/webp
 
 # Enable services
 echo "Enabling services..."

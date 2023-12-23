@@ -6,7 +6,7 @@ return {
 	name = os.getenv("USER"):upper(),
 	username = os.getenv("USER") .. "@" .. io.open("/etc/hostname"):read("a"):gsub("\n$", ""),
 	apps = {
-		calculator = "honey",
+		calculator = "/home/neph/Documents/Coding/Desktop\\ Apps/honey/src-tauri/target/release/honey",
 		file_explorer = "nemo",
 	},
 }

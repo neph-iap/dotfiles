@@ -54,19 +54,64 @@ function tags_widget:refresh_numbers()
 	})
 end
 
+-- Sliding animation
+
+local top = -110
+local slide_speed = 20
+
+local is_closing = false
+
+local function slide_in()
+	if is_closing then
+		return
+	end
+	awful.placement.align(tags_widget, { position = "top", honor_workarea = true, margins = { right = theme.custom.default_margin, top = top } })
+	top = top + slide_speed
+	if top < 20 then
+		awful.spawn.easy_async_with_shell("sleep 0.001", function()
+			slide_in()
+		end)
+	elseif top > 20 then
+		top = 20
+		awful.placement.align(tags_widget, { position = "top", honor_workarea = true, margins = { right = theme.custom.default_margin, top = top } })
+	end
+end
+
+local function slide_out()
+	is_closing = true
+	awful.placement.align(tags_widget, { position = "top", honor_workarea = true, margins = { right = theme.custom.default_margin, top = top } })
+	top = top - slide_speed
+	if top > -110 then
+		awful.spawn.easy_async_with_shell("sleep 0.001", function()
+			slide_out()
+		end)
+	elseif top < -110 then
+		top = -110
+		awful.placement.align(tags_widget, { position = "top", honor_workarea = true, margins = { right = theme.custom.default_margin, top = top } })
+		tags_widget.visible = false
+		is_closing = false
+	end
+end
+
 function tags_widget:toggle()
-	self.visible = not self.visible
-	if self.visible then
-		tags_widget:refresh_numbers()
+	awful.placement.align(tags_widget, { position = "top", honor_workarea = true, margins = { right = theme.custom.default_margin, top = top } })
+	if not self.visible then
+		self.visible = true
+		self:refresh_numbers()
+		slide_in()
+	else
+		slide_out()
 	end
 end
 
 function tags_widget:close()
-	self.visible = false
+	slide_out()
 end
 
 function tags_widget:open()
 	self.visible = true
+	self:refresh_numbers()
+	slide_in()
 end
 
 tags_widget.visible = false

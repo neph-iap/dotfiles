@@ -10,7 +10,7 @@ sidebar.height = awful.screen.focused().workarea.height - (2 * theme.custom.defa
 sidebar.visible = true
 sidebar.bg = theme.custom.primary_background
 
-awful.placement.top_left(sidebar, { honor_workarea = true, margins = { left = theme.custom.default_margin, top = theme.custom.default_margin } })
+awful.placement.top_left(sidebar, { honor_workarea = true, margins = { left = -300, top = theme.custom.default_margin } })
 
 local name = wibox.widget.textbox()
 name.markup = ("<b>%s</b>"):format(preferences.name)
@@ -327,10 +327,46 @@ function sidebar:refresh_numbers()
 	})
 end
 
+-- Sliding animation
+
+local slide_speed = 50
+local left = -400
+
+local function slide_in()
+	awful.placement.top_left(sidebar, { honor_workarea = true, margins = { left = left, top = theme.custom.default_margin } })
+	left = left + slide_speed
+	if left < 10 then
+		awful.spawn.easy_async_with_shell("sleep 0.001", function()
+			slide_in()
+		end)
+	elseif left > 10 then
+		left = 10
+		awful.placement.top_left(sidebar, { honor_workarea = true, margins = { left = left, top = theme.custom.default_margin } })
+	end
+end
+
+local function slide_out()
+	awful.placement.top_left(sidebar, { honor_workarea = true, margins = { left = left, top = theme.custom.default_margin } })
+	left = left - slide_speed
+	if left > -400 then
+		awful.spawn.easy_async_with_shell("sleep 0.001", function()
+			slide_out()
+		end)
+	elseif left < -400 then
+		left = -400
+		awful.placement.top_left(sidebar, { honor_workarea = true, margins = { left = left, top = theme.custom.default_margin } })
+		sidebar.visible = false
+	end
+end
+
 function sidebar:toggle()
-	self.visible = not self.visible
-	if self.visible then
+	awful.placement.top_left(self, { honor_workarea = true, margins = { left = left, top = theme.custom.default_margin } })
+	if not self.visible then
+		self.visible = true
 		sidebar:refresh_numbers()
+		slide_in()
+	else
+		slide_out()
 	end
 end
 

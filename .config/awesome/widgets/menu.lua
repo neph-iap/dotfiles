@@ -5,6 +5,9 @@ local theme = require("misc.theme")
 
 local public = {}
 
+local slide_speed = 100
+local top = -700
+
 local menu = wibox({ visible = false, ontop = true, type = "dock", screen = screen.primary })
 menu.width = 500
 menu.height = 700
@@ -291,14 +294,47 @@ function public.setup(widgets)
 		})
 	end
 
-	function menu:toggle()
-		self.visible = not self.visible
-		if self.visible then
-			menu:refresh_numbers()
-		end
-	end
-
 	menu.visible = false
+end
+
+-- Sliding animation
+
+local function slide_in()
+	awful.placement.top_right(menu, { honor_workarea = true, margins = { right = theme.custom.default_margin, top = top } })
+	top = top + slide_speed
+	if top < 10 then
+		awful.spawn.easy_async_with_shell("sleep 0.001", function()
+			slide_in()
+		end)
+	elseif top > 10 then
+		top = 10
+		awful.placement.top_right(menu, { honor_workarea = true, margins = { right = theme.custom.default_margin, top = top } })
+	end
+end
+
+local function slide_out()
+	awful.placement.top_right(menu, { honor_workarea = true, margins = { right = theme.custom.default_margin, top = top } })
+	top = top - slide_speed
+	if top > -700 then
+		awful.spawn.easy_async_with_shell("sleep 0.001", function()
+			slide_out()
+		end)
+	elseif top < -700 then
+		top = -700
+		awful.placement.top_right(menu, { honor_workarea = true, margins = { right = theme.custom.default_margin, top = top } })
+		menu.visible = false
+	end
+end
+
+function menu:toggle()
+	awful.placement.top_right(menu, { honor_workarea = true, margins = { right = theme.custom.default_margin, top = top } })
+	if not self.visible then
+		self.visible = true
+		self:refresh_numbers()
+		slide_in()
+	else
+		slide_out()
+	end
 end
 
 public.widget = menu

@@ -26,7 +26,7 @@ local function modkey_released(widgets)
 	widgets.tags:close()
 	if not other_key_was_pressed then
 		widgets.menu:toggle()
-		widgets.menu.search:run()
+		-- widgets.menu.search:run()
 	else
 		other_key_was_pressed = false
 	end

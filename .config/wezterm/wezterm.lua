@@ -77,8 +77,7 @@ config.keys = {
 
 wezterm.on("gui-startup", function(window)
 	local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
-	local gui_window = window:gui_window()
-	gui_window:maximize()
+	window:gui_window():maximize()
 end)
 
 return config

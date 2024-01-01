@@ -44,31 +44,32 @@ function public.setup(widgets)
 	public.globalkeys = gears.table.join(
 
 		-- Modkey (requires special press/release handling)
-		awful.key({}, modkey_code, function() modkey_pressed(widgets) end, function() end, { description = "Open taglist", group = "launcher" }),
-		awful.key({ modkey }, modkey_code, function() end, function() modkey_released(widgets) end, { description = "Open taglist", group = "launcher" }),
+		awful.key({}, modkey_code, function() modkey_pressed(widgets) end, function() end),
+		awful.key({ modkey }, modkey_code, function() end, function() modkey_released(widgets) end),
 
-		-- Menus
-		awful.key({ modkey }, "`", f(function() widgets.sidebar:toggle() end), { description = "open sidebar", group = "launcher" }),
-		awful.key({ modkey }, "Escape", f(function() awful.spawn.with_shell(os.getenv("HOME") .. "/.config/rofi/powermenu/type-4/powermenu.sh") end)),
-		awful.key({ modkey }, "b", f(function() widgets.dock:toggle() end), { description = "toggle dock", group = "launcher" }),
+		-- Menus & Widgets
+		awful.key({ modkey }, "`", f(function() widgets.sidebar:toggle() end)),
+		awful.key({ modkey }, "b", f(function() widgets.dock:toggle() end)),
 
 		-- Tags
-		awful.key({ modkey }, "Left", f(awful.tag.viewprev), { description = "view previous", group = "tag" }),
-		awful.key({ modkey }, "Right", f(awful.tag.viewnext), { description = "view next", group = "tag" }),
+		awful.key({ modkey }, "Left", f(awful.tag.viewprev)),
+		awful.key({ modkey }, "Right", f(awful.tag.viewnext)),
 
-		-- Launch Programs
+		-- Launch Programs (These generally use mod + shift)
 		awful.key({ modkey }, "r", f(function() awful.spawn(os.getenv("HOME") .. "/.config/rofi/launchers/type-3/launcher.sh") end)),
-		awful.key({ modkey }, "Return", f(function() awful.spawn("wezterm") end)),
+		awful.key({ modkey }, "Return", f(function() awful.spawn(preferences.terminal) end)),
 		awful.key({ modkey, "Shift" }, "l", f(function() awful.spawn("librewolf") end)),
 		awful.key({ modkey, "Shift" }, "d", f(function() awful.spawn("discord") end)),
 		awful.key({ modkey, "Shift" }, "s", f(function() awful.spawn("flameshot gui") end)),
 		awful.key({ modkey, "Shift" }, "c", f(function() awful.spawn(preferences.apps.calculator) end)),
 
 		-- Awesome Core Functions
-		awful.key({ modkey, "Control" }, "r", f(awesome.restart), { description = "reload awesome", group = "awesome" }),
-		awful.key({ modkey, "Shift" }, "q", f(awesome.quit), { description = "quit awesome", group = "awesome" }),
-		awful.key({ modkey }, "l", f(function() awful.layout.inc(1) end), { description = "select next", group = "layout" }),
-		awful.key({}, "Print", f(function() awful.spawn.with_shell('flameshot full --path "' .. os.getenv("HOME") .. '/Pictures/Screenshots/' .. tostring(os.date("%x")):gsub("/", "_") .. " at " .. tostring(os.date("%X")):gsub(":|%s", "_") .. '"') end), { description = "take a screenshot", group = "awesome" }),
+		awful.key({ modkey }, "r", f(awesome.restart)),
+		awful.key({ modkey }, "q", f(awesome.quit)),
+		awful.key({ modkey }, "f", f(function() awful.layout.inc(1); for _, some_client in ipairs(client.get()) do some_client:emit_signal("request::titlebars") end end)),
+
+		-- Print screen key
+		awful.key({}, "Print", f(function() awful.spawn.with_shell('flameshot full --path "' .. os.getenv("HOME") .. '/Pictures/Screenshots/' .. tostring(os.date("%x")):gsub("/", "_") .. " at " .. tostring(os.date("%X")):gsub(":|%s", "_") .. '"') end)),
 
 		-- Brightness
 		awful.key({}, "XF86MonBrightnessUp", function() os.execute("brightnessctl set +10%"); widgets.menu:refresh_numbers(); widgets.brightness:show() end, { description = "Increase brightness", group = "brightness" }),
@@ -88,18 +89,11 @@ function public.setup(widgets)
 		awful.key({}, "XF86AudioMute", function() os.execute("pamixer --set-volume 0"); widgets.menu:refresh_numbers(); widgets.volume:show() end, { description = "Mute volume", group = "audio" })
 	)
 
-	-- Client keys
+	-- Client keys (These generally use mod + ctrl)
 	public.clientkeys = gears.table.join(
-		awful.key({ modkey, "Control" }, "f", f(function(c) c.fullscreen = not c.fullscreen end), { description = "toggle fullscreen", group = "client" }),
-		awful.key({ modkey, "Control" }, "c", function(c) c:kill() end, { description = "close", group = "client" }),
-		awful.key({ modkey, "Control" }, "space", awful.client.floating.toggle, { description = "toggle floating", group = "client" }),
-		awful.key({ modkey, "Control" }, "Return", function(c) c:swap(awful.client.getmaster()) end, { description = "move to master", group = "client" }),
-		awful.key({ modkey }, "o", function(c) c:move_to_screen() end, { description = "move to screen", group = "client" }),
-		awful.key({ modkey }, "t", function(c) c.ontop = not c.ontop end, { description = "toggle keep on top", group = "client" }),
-		awful.key({ modkey }, "n", function(c) c.minimized = true end, { description = "minimize", group = "client" }),
-		awful.key({ modkey }, "m", function(c) c.maximized = not c.maximized c:raise() end, { description = "(un)maximize", group = "client" }),
-		awful.key({ modkey, "Control" }, "m", function(c) c.maximized_vertical = not c.maximized_vertical c:raise() end, { description = "(un)maximize vertically", group = "client" }),
-		awful.key({ modkey, "Shift" }, "m", function(c) c.maximized_horizontal = not c.maximized_horizontal c:raise() end, { description = "(un)maximize horizontally", group = "client" })
+		awful.key({ modkey, "Control" }, "f", f(function(c) c.fullscreen = not c.fullscreen end)),
+		awful.key({ modkey, "Control" }, "q", function(c) c:kill() end),
+		awful.key({ modkey, "Control" }, "m", function(c) c.maximized = not c.maximized c:raise() end)
 	)
 
 	-- Tags

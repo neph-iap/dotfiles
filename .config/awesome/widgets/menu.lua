@@ -13,6 +13,11 @@ menu.width = 500
 menu.height = 700
 menu.visible = true
 menu.bg = theme.custom.primary_background
+menu.border_width = 2
+menu.border_color = theme.custom.primary_foreground
+menu.shape = function(cr, width, height)
+	gears.shape.rounded_rect(cr, width, height, 15)
+end
 
 awful.placement.top_right(menu, { honor_workarea = true, margins = { right = theme.custom.default_margin, top = theme.custom.default_margin } })
 

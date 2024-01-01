@@ -22,6 +22,7 @@ local clientbuttons = gears.table.join(
 		awful.mouse.client.resize(c)
 	end)
 )
+
 -- Rules to apply to new clients (through the "manage" signal).
 awful.rules.rules = {
 	-- All clients will match this rule.
@@ -233,4 +234,10 @@ client.connect_signal("focus", function(c)
 end)
 client.connect_signal("unfocus", function(c)
 	c.border_color = beautiful.border_normal
+end)
+
+client.connect_signal("manage", function(c)
+	c.shape = function(cr, w, h)
+		gears.shape.rounded_rect(cr, w, h, 10)
+	end
 end)

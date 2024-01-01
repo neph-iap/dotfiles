@@ -9,6 +9,11 @@ sidebar.width = 400
 sidebar.height = awful.screen.focused().workarea.height - (2 * theme.custom.default_margin)
 sidebar.visible = true
 sidebar.bg = theme.custom.primary_background
+sidebar.border_width = 2
+sidebar.border_color = theme.custom.primary_foreground
+sidebar.shape = function(cr, width, height)
+	gears.shape.rounded_rect(cr, width, height, 15)
+end
 
 awful.placement.top_left(sidebar, { honor_workarea = true, margins = { left = -300, top = theme.custom.default_margin } })
 
@@ -27,6 +32,8 @@ profile.clip_shape = function(cr, width, height)
 	gears.shape.circle(cr, width, height, 150)
 end
 
+local month_override = 0
+
 function sidebar:refresh_numbers()
 	local wifi = wibox.widget.textbox()
 	wifi.markup = ('<span color="#DDDDDD">%s</span>'):format("󰖩 " .. io.popen("iwgetid -r"):read("a"):gsub("\n$", ""))
@@ -34,6 +41,21 @@ function sidebar:refresh_numbers()
 	wifi.font = "OpenSans 20"
 
 	local today = os.date("*t")
+	if month_override then
+		local year = today.year
+		if today.month + month_override > 12 then
+			year = year + 1
+		elseif today.month + month_override < 1 then
+			year = year - 1
+		end
+		local month = (today.month + month_override - 1) % 12 + 1
+		local specifiedDate = os.time({
+			year = year,
+			month = month,
+			day = today.day,
+		})
+		today = os.date("*t", specifiedDate)
+	end
 	local first_of_month = (today.wday - today.day + 1) % 7
 
 	local months = {
@@ -62,7 +84,10 @@ function sidebar:refresh_numbers()
 	}
 
 	local calendar_title = wibox.widget.textbox()
-	local this_month = months[today.month]
+	-- local this_month_number = (today.month + month_override - 1) % 12 + 1
+	local this_month_number = today.month
+	local this_month = months[this_month_number]
+	-- local this_month = months[this_month_number]
 	calendar_title.markup = ('<span color="%s">%s</span>'):format(theme.custom.primary_foreground, this_month)
 	calendar_title.font = "OpenSans 20"
 	calendar_title.align = "center"
@@ -85,8 +110,9 @@ function sidebar:refresh_numbers()
 
 	local week_days = { layout = wibox.layout.flex.horizontal }
 	for index, week_day in ipairs(days) do
+		-- This week?
 		local color = theme.custom.primary_foreground
-		if today.wday == index then
+		if today.wday == index and month_override == 0 then
 			color = "#FFFFFF"
 		end
 
@@ -104,24 +130,23 @@ function sidebar:refresh_numbers()
 			local day_number = (week_number - 1) * 7 + day - first_of_month + 1
 			local color = theme.custom.primary_foreground
 
+			-- Last month
 			if day_number < 1 then
-				local last_month = { today.month - 1, today.year }
-				if today.month == 1 then
+				local last_month = { this_month_number - 1, today.year }
+				if this_month_number == 1 then
 					last_month = { 12, today.year - 1 }
 				end
 				day_number = days_in_month(last_month[1], last_month[2]) - math.abs(day_number)
 				color = theme.custom.secondary_foreground
-			elseif day_number > days_in_month(today.month, today.year) then
-				day_number = day_number - days_in_month(today.month, today.year)
+
+			-- Next month
+			elseif day_number > days_in_month(this_month_number, today.year) then
+				day_number = day_number - days_in_month(this_month_number, today.year)
 				color = theme.custom.secondary_foreground
 			end
 
-			if week_number == 6 and day_number == 1 and day_number < 8 then
-				goto continue
-			end
-
 			local is_today = false
-			if color == theme.custom.primary_foreground and day_number == today.day then
+			if color == theme.custom.primary_foreground and day_number == today.day and month_override == 0 then
 				color = theme.custom.primary_background
 				is_today = true
 			end
@@ -161,7 +186,6 @@ function sidebar:refresh_numbers()
 			end)
 
 			table.insert(week, day_widget)
-			::continue::
 		end
 		table.insert(month, week)
 	end
@@ -171,18 +195,17 @@ function sidebar:refresh_numbers()
 	local calendar_left = wibox.widget.textbox()
 	calendar_left.markup = ('<span color="%s">    󰍞</span>'):format(theme.custom.primary_foreground)
 	calendar_left.font = "OpenSans 10"
+	calendar_left:connect_signal("button::press", function()
+		month_override = month_override - 1
+		sidebar:refresh_numbers()
+	end)
 
 	local calendar_right = wibox.widget.textbox()
 	calendar_right.markup = ('<span color="%s">󰍟   </span>'):format(theme.custom.primary_foreground)
 	calendar_right.font = "OpenSans 10"
 	calendar_right.align = "right"
 	calendar_right:connect_signal("button::press", function()
-		today.month = today.month + 1
-		if today.month > 12 then
-			today.month = 1
-			today.year = today.year + 1
-		end
-		calendar_title.markup = ('<span color="%s">%s</span>'):format(theme.custom.primary_foreground, months[today.month])
+		month_override = month_override + 1
 		sidebar:refresh_numbers()
 	end)
 
@@ -260,6 +283,10 @@ function sidebar:refresh_numbers()
 
 	local calendar_icon = wibox.widget.textclock("󰸗")
 	calendar_icon.font = "OpenSans 32"
+	calendar_icon:connect_signal("button::press", function()
+		awful.spawn(preferences.apps.calendar)
+		sidebar:toggle()
+	end)
 
 	local mail_icon = wibox.widget.textclock("󰇮")
 	mail_icon.font = "OpenSans 32"
@@ -367,6 +394,7 @@ function sidebar:toggle()
 		slide_in()
 	else
 		slide_out()
+		month_override = 0
 	end
 end
 

@@ -19,7 +19,7 @@ local preferences = require("misc.preferences")
 
 require("misc.startup") -- Handle errors on startup
 
-beautiful.init(os.getenv("HOME") .. "/.config/awesome/theme.lua") -- Initialize theme
+beautiful.init(os.getenv("HOME") .. "/.config/awesome/misc/theme.lua") -- Initialize theme
 
 -- Initialize widgets
 local sidebar = require("widgets.sidebar")

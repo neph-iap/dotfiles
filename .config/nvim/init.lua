@@ -11,7 +11,6 @@ Neph Iapalucci's init.lua configuration for Neovim.
 -- =======================================================================================================================================================================================================
 -- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options ---------- Options -
 -- =======================================================================================================================================================================================================
-
 vim.opt.cursorline = true -- Highlight line that cursor is on
 vim.opt.hlsearch = false -- Don't highlight searches
 vim.opt.incsearch = true -- Incrementally highlight searches
@@ -45,6 +44,7 @@ local filetypes = {
 	["*.rasi"] = "rasi",
 	["*.pest"] = "pest",
 	["*.lotus"] = "lotus",
+	["*.lang2"] = "lang2",
 }
 
 for pattern, filetype in pairs(filetypes) do
@@ -217,7 +217,7 @@ require("lazy").setup(
 						local root_directory = current_directory
 						while not is_root_dir(root_directory) do
 							root_directory = vim.fn.fnamemodify(root_directory, ":h")
-							if root_directory == os.getenv("HOME") then
+							if root_directory == "/" then
 								root_directory = current_directory
 								break
 							end
@@ -535,6 +535,7 @@ require("lazy").setup(
 											"-A", "clippy::module_name_repetitions", -- Repeating module name in identifiers
 											"-A", "clippy::cast_precision_loss", -- Casting between numeric types where precision may be lost (such as an i32 to an i16)
 											"-A", "clippy::cast_lossless",
+											"-A", "clippy::missing_docs_in_private_items", -- Missing documentation comments
 
 											-- stylua: ignore end
 										},
@@ -949,9 +950,9 @@ require("lazy").setup(
 					local current_directory = vim.fn.expand("%:p:h")
 					local root_directory = current_directory
 					local is_root, filetype = is_root_dir(root_directory)
-					while not (is_root or root_directory == os.getenv("HOME")) do
+					while not (is_root or root_directory == "/") do
 						root_directory = vim.fn.fnamemodify(root_directory, ":h") -- Set to parent dir
-						if root_directory == os.getenv("HOME") then
+						if root_directory == "/" then
 							root_directory = current_directory
 							break
 						end
@@ -982,7 +983,19 @@ require("lazy").setup(
 				local neotree_bg = vim.api.nvim_exec("hi NeoTreeNormal", true):match("guibg=(#%S*)")
 				vim.api.nvim_set_hl(0, "CustomBufferlineOffset", { fg = color, bg = neotree_bg })
 
+				local buffers_opened = {}
+
+				function buffers_opened:index_of(buffer)
+					for i, buf in ipairs(self) do
+						if buf == buffer then
+							return i
+						end
+					end
+					return nil
+				end
+
 				local bufferline = require("bufferline")
+
 				bufferline.setup({
 					options = {
 						style_preset = {
@@ -1021,8 +1034,76 @@ require("lazy").setup(
 						},
 					},
 				})
+
+				-- Manual sorting wizardry - This enusres that the tabs are always sorted by most recently opened.
+				-- Every time a buffer is opened, it is automatically made the first tab, and the rest are shifted
+				-- to the right. Thus, the closest tabs are the most recently used.
+				vim.api.nvim_create_autocmd("BufEnter", {
+					callback = function(args)
+						local state = require("bufferline.state")
+						table.remove_value(buffers_opened, args.buf)
+						table.insert(buffers_opened, args.buf)
+						table.sort(state.components, function(a, b)
+							local a_index = buffers_opened:index_of(a.id)
+							local b_index = buffers_opened:index_of(b.id)
+							return a_index > b_index
+						end)
+						for index, buf in ipairs(state.components) do
+							buf.ordinal = index
+						end
+						state.custom_sort = require("bufferline.utils").get_ids(state.components)
+						require("bufferline.ui").refresh()
+					end,
+				})
+
+				-- vim.keymap.set("n", "<S-h>", ":BufferLineCyclePrev<CR>", {}) -- Move to next buffer
+				vim.keymap.set("n", "<S-h>", function()
+					vim.cmd("BufferLineCyclePrev")
+					vim.cmd("BufferLineCyclePrev")
+				end, {})
+				vim.keymap.set("n", "<S-l>", ":BufferLineCycleNext<CR>", {}) -- Move to previous buffer
 			end,
 			event = "VeryLazy", -- Required after NeoTreeNormal highlight group is loaded
+		},
+
+		{
+			"mfussenegger/nvim-lint",
+			config = function()
+				require("lint").linters.lang2 = {
+					name = "lang2",
+					cmd = "lang2",
+					args = {},
+					stdin = false,
+					stream = "both",
+					ignore_exitcode = false,
+					parser = function(output, bufnr)
+						local diagnostics = {}
+						for _, line in ipairs(vim.split(output, "\n")) do
+							local line_number, column, severity, message = line:match("^Error: (%d+):(%d+):(%w+):(.*)")
+							if line_number then
+								table.insert(diagnostics, {
+									bufnr = bufnr,
+									lnum = tonumber(line_number),
+									col = tonumber(column),
+									severity = vim.diagnostic.severity.ERROR,
+									message = message,
+								})
+							end
+						end
+						return diagnostics
+					end,
+				}
+
+				require("lint").linters_by_ft = {
+					lang2 = { "lang2" },
+				}
+
+				vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+					callback = function()
+						require("lint").try_lint()
+					end,
+				})
+			end,
 		},
 	},
 
@@ -1068,8 +1149,6 @@ vim.keymap.set("n", "<C-j>", "<C-w>j", {}) -- Move to window below
 vim.keymap.set("n", "<C-k>", "<C-w>k", {}) -- Move to window above
 vim.keymap.set("n", "<C-h>", "<C-w>h", {}) -- Move to window left
 vim.keymap.set("n", "<C-l>", "<C-w>l", {}) -- Move to window right
-vim.keymap.set("n", "<S-h>", ":BufferLineCyclePrev<CR>", {}) -- Move to next buffer
-vim.keymap.set("n", "<S-l>", ":BufferLineCycleNext<CR>", {}) -- Move to previous buffer
 
 -- Lsp Mappings
 vim.keymap.set("n", "<leader>fr", ":Forge<CR>", { silent = true }) -- Open Forge.nvim

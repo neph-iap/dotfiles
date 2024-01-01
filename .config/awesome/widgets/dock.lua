@@ -2,8 +2,14 @@ local wibox = require("wibox")
 local awful = require("awful")
 local theme = require("misc.theme")
 local gears = require("gears")
+local preferences = require("misc.preferences")
 
-local apps = { "wezterm", "firefox", "discord" }
+local apps = {
+	preferences.terminal:match("^(%S+)"),
+	preferences.apps.browser:match("^(%S+)"),
+	preferences.apps.chat:match("^(%S+)"),
+	preferences.apps.file_explorer:match("^(%S+)"),
+}
 
 local function get_app_icon(app_name)
 	local dirs_to_check = {
@@ -35,10 +41,9 @@ end
 
 local space_between_icons = 40
 
-local dock = wibox({ visible = false, ontop = true, type = "dock", screen = screen.primary })
+local dock = wibox({ visible = true, ontop = true, type = "dock", screen = screen.primary })
 dock.width = #apps * (75 + space_between_icons)
 dock.height = 75
-dock.visible = true
 dock.bg = "#FF000000"
 
 awful.placement.align(dock, { position = "bottom", honor_workarea = true, margins = { bottom = theme.custom.default_margin } })
@@ -91,6 +96,8 @@ function dock:refresh_numbers()
 	})
 end
 
+dock:refresh_numbers()
+
 function dock:toggle()
 	self.visible = not self.visible
 	if self.visible then
@@ -105,8 +112,6 @@ end
 function dock:open()
 	self.visible = true
 end
-
-dock.visible = false
 
 return {
 	widget = dock,

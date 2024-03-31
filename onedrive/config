@@ -1,0 +1,3 @@
+sync_dir = "~"
+skip_file = ""
+disable_notifications = "true"

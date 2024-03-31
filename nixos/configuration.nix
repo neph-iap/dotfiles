@@ -59,6 +59,7 @@
   environment.systemPackages = with pkgs; [
     discord
     librewolf
+    firefox
     git
     jdk17
     jetbrains.idea-community

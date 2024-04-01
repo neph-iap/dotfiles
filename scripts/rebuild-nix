@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+sudo mv /etc/nixos/configuration.nix /etc/nixos/configuration.nix.prev
+sudo cp ~/.config/nixos/configuration.nix /etc/nixos/configuration.nix
+
+sudo nixos-rebuild switch
+pushd ~/.config/
+git add .
+git commit -m "NixOS Update"
+git push
+popd

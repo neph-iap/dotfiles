@@ -77,7 +77,6 @@
     (vscode-with-extensions.override {
       vscode = vscodium;
       vscodeExtensions = with vscode-extensions; [
-        #cval.pastel-theme
         github.copilot
         gruntfuggly.todo-tree
         pkief.material-icon-theme
@@ -85,10 +84,8 @@
         rust-lang.rust-analyzer
         serayuzgur.crates
         tamasfe.even-better-toml
-        #ultram4rine.vscode-choosealicense
         usernamehw.errorlens
         vscodevim.vim
-        zhuangtongfa.material-theme
       ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "one-midnight";

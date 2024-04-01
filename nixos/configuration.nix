@@ -81,6 +81,7 @@
         github.copilot
         gruntfuggly.todo-tree
         pkief.material-icon-theme
+        redhat.java
         rust-lang.rust-analyzer
         serayuzgur.crates
         tamasfe.even-better-toml

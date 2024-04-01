@@ -11,6 +11,9 @@
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
+  # System settings
+  system.stateVersion = "23.11";
+
   # Internationalization
   time.timeZone = "America/New_York";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -71,12 +74,11 @@
     rocmPackages.llvm.clang
     rustup
     ueberzugpp
+    vscodium
     wezterm
   ];
 
   fonts.packages = with pkgs; [
     fira-code
   ];
-
-  system.stateVersion = "23.11";
 }

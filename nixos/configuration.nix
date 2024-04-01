@@ -77,7 +77,11 @@
     (vscode-with-extensions.override {
       vscode = vscodium;
       vscodeExtensions = with vscode-extensions; [
+        rust-lang.rust-analyzer
+        serayuzgur.crates
+        tamasfe.even-better-toml
         vscodevim.vim
+        zhuangtongfa.material-theme
       ];
     })
     wezterm

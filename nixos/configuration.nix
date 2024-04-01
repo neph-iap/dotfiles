@@ -75,6 +75,12 @@
     rustup
     ueberzugpp
     vscodium
+    (vscode-with-extensions.override {
+      vscode = vscodium;
+      vscodeExtensions = with vscode-extensions; [
+        vscodevim.vim
+      ];
+    })
     wezterm
   ];
 

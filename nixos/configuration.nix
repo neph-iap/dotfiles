@@ -89,6 +89,13 @@
         usernamehw.errorlens
         vscodevim.vim
         zhuangtongfa.material-theme
+      ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+        {
+          name = "one-midnight";
+          publisher = "violetiapalucci";
+          version = "1.0.0";
+          sha256 = "sha256-mx3hz2pRwL0cUDGnRy9eER/+SR7KXc8et2RcW//Ct6Q=";
+        }
       ];
     })
     wezterm

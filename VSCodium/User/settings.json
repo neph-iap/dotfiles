@@ -43,5 +43,6 @@
         "editor.defaultFormatter": "rust-lang.rust-analyzer"
     },
     "rust-analyzer.inlayHints.parameterHints.enable": false,
-    "rust-analyzer.check.command": "clippy"
+    "rust-analyzer.check.command": "clippy",
+    "security.workspace.trust.untrustedFiles": "open"
 }

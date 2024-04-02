@@ -76,7 +76,6 @@
     rustup
     ueberzugpp
     (vscode-with-extensions.override {
-      vscode = vscodium;
       vscodeExtensions = with vscode-extensions; [
         github.copilot
         gruntfuggly.todo-tree

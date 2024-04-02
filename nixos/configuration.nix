@@ -64,6 +64,7 @@
     librewolf
     firefox
     git
+    gcc
     jdk17
     jetbrains.idea-community
     lua

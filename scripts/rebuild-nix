@@ -7,10 +7,12 @@ sudo cp ~/.config/nixos/configuration.nix /etc/nixos/configuration.nix
 
 sudo nixos-rebuild switch
 
+# Commit & Push to git if dotfiles are managed by git
 if [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ] ; then
 	pushd ~/.config/
 	git add .
-	git commit -m "NixOS Update"
+	read -p "Commit message: " commit_message
+	git commit -m "NixOS Update: $commit_message"
 	git push
 	popd
 fi

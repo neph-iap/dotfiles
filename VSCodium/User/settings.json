@@ -7,7 +7,7 @@
     "breadcrumbs.enabled": false,
     "color-highlight.markRuler": false,
     "explorer.confirmDragAndDrop": false,
-    "window.zoomLevel": 2,
+    "window.zoomLevel": 1,
     "files.eol": "\n",
     "files.exclude": {
         "**/*.meta": true

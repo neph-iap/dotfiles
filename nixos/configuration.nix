@@ -79,7 +79,6 @@ in
     firefox
     git
     gcc
-    gnome.gnome-weather
     jetbrains.idea-community
     libreoffice-qt
     lua

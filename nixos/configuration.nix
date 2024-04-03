@@ -76,7 +76,6 @@ in
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
     discord
-    librewolf
     firefox
     git
     gcc

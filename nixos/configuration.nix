@@ -1,7 +1,22 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, ... }:
+let
+  unstableTarball =
+    fetchTarball
+      https://github.com/NixOS/nixpkgs-channels/archive/nixos-unstable.tar.gz;
+in
+{
 
   # Hardware
   imports = [ ./hardware-configuration.nix ];
+
+  # Load unstable packages
+  nixpkgs.config = {
+    packageOverrides = pkgs: with pkgs; {
+      unstable = import unstableTarball {
+        config = config.nixpkgs.config;
+      };
+    };
+  };
 
   # Bootloader
   boot.loader.systemd-boot.enable = true;
@@ -65,8 +80,8 @@
     firefox
     git
     gcc
-    jdk17
     jetbrains.idea-community
+    libreoffice-qt
     lua
     neofetch
     neovim
@@ -98,6 +113,9 @@
     })
     wezterm
   ];
+
+  programs.java.enable = true;
+  programs.java.package = pkgs.jdk21;
 
   fonts.packages = with pkgs; [
     fira-code

@@ -72,7 +72,7 @@ config.keys = {
 	{ key = "v", mods = "CTRL", action = wezterm.action.PasteFrom("Clipboard") },
 	{ key = "w", mods = "CTRL", action = wezterm.action.CloseCurrentTab({ confirm = true }) },
 	{ key = "t", mods = "CTRL", action = wezterm.action.SpawnTab("CurrentPaneDomain") },
-	{ key = "C", mods = "CTRL", action = wezterm.action.CopyTo("Clipboard") },
+	{ key = "c", mods = "CTRL", action = wezterm.action.CopyTo("Clipboard") },
 }
 
 wezterm.on("gui-startup", function(window)

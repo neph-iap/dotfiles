@@ -595,7 +595,6 @@ require("lazy").setup(
 					vim.fn["mkdp#util#install"]()
 				end)
 			end,
-			cmd = { "MarkdownPreview", "MarkdownPreviewToggle" },
 		},
 
 		-- Command line improvements and message tooltips

@@ -90,6 +90,7 @@ in
     rocmPackages.llvm.clang
     rustup
     ueberzugpp
+    unzip
     (vscode-with-extensions.override {
       vscode = vscodium;
       vscodeExtensions = with vscode-extensions; [
@@ -99,6 +100,7 @@ in
         redhat.java
         rust-lang.rust-analyzer
         serayuzgur.crates
+        sumneko.lua
         tamasfe.even-better-toml
         usernamehw.errorlens
         vscodevim.vim
@@ -112,6 +114,7 @@ in
       ];
     })
     wezterm
+    wget
   ];
 
   programs.java.enable = true;

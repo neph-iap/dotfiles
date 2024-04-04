@@ -13,6 +13,8 @@
 !VSCodium/User/settings.json
 !scripts
 !scripts/*
+!lotus
+!lotus/*
 !.gitignore
 !install.sh
 !README.md

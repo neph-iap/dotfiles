@@ -590,7 +590,7 @@ require("lazy").setup(
 		-- Live markdown preview
 		{
 			"iamcco/markdown-preview.nvim",
-			config = function()
+			build = function()
 				vim.schedule(function()
 					vim.fn["mkdp#util#install"]()
 				end)
@@ -1034,33 +1034,33 @@ require("lazy").setup(
 					},
 				})
 
-				-- Manual sorting wizardry - This enusres that the tabs are always sorted by most recently opened.
-				-- Every time a buffer is opened, it is automatically made the first tab, and the rest are shifted
-				-- to the right. Thus, the closest tabs are the most recently used.
-				vim.api.nvim_create_autocmd("BufEnter", {
-					callback = function(args)
-						local state = require("bufferline.state")
-						table.remove_value(buffers_opened, args.buf)
-						table.insert(buffers_opened, args.buf)
-						table.sort(state.components, function(a, b)
-							local a_index = buffers_opened:index_of(a.id)
-							local b_index = buffers_opened:index_of(b.id)
-							return a_index > b_index
-						end)
-						for index, buf in ipairs(state.components) do
-							buf.ordinal = index
-						end
-						state.custom_sort = require("bufferline.utils").get_ids(state.components)
-						require("bufferline.ui").refresh()
-					end,
-				})
-
-				-- vim.keymap.set("n", "<S-h>", ":BufferLineCyclePrev<CR>", {}) -- Move to next buffer
-				vim.keymap.set("n", "<S-h>", function()
-					vim.cmd("BufferLineCyclePrev")
-					vim.cmd("BufferLineCyclePrev")
-				end, {})
-				vim.keymap.set("n", "<S-l>", ":BufferLineCycleNext<CR>", {}) -- Move to previous buffer
+				-- -- Manual sorting wizardry - This enusres that the tabs are always sorted by most recently opened.
+				-- -- Every time a buffer is opened, it is automatically made the first tab, and the rest are shifted
+				-- -- to the right. Thus, the closest tabs are the most recently used.
+				-- vim.api.nvim_create_autocmd("BufEnter", {
+				-- 	callback = function(args)
+				-- 		local state = require("bufferline.state")
+				-- 		table.remove_value(buffers_opened, args.buf)
+				-- 		table.insert(buffers_opened, args.buf)
+				-- 		table.sort(state.components, function(a, b)
+				-- 			local a_index = buffers_opened:index_of(a.id)
+				-- 			local b_index = buffers_opened:index_of(b.id)
+				-- 			return a_index > b_index
+				-- 		end)
+				-- 		for index, buf in ipairs(state.components) do
+				-- 			buf.ordinal = index
+				-- 		end
+				-- 		state.custom_sort = require("bufferline.utils").get_ids(state.components)
+				-- 		require("bufferline.ui").refresh()
+				-- 	end,
+				-- })
+				--
+				-- -- vim.keymap.set("n", "<S-h>", ":BufferLineCyclePrev<CR>", {}) -- Move to next buffer
+				-- vim.keymap.set("n", "<S-h>", function()
+				-- 	vim.cmd("BufferLineCyclePrev")
+				-- 	vim.cmd("BufferLineCyclePrev")
+				-- end, {})
+				-- vim.keymap.set("n", "<S-l>", ":BufferLineCycleNext<CR>", {}) -- Move to previous buffer
 			end,
 			event = "VeryLazy", -- Required after NeoTreeNormal highlight group is loaded
 		},

@@ -1,0 +1,30 @@
+-- Environment variables
+$PS1 = "> "
+
+-- Preference variables
+local editor = nvim
+
+function cfg(app)
+	local config_file = {
+		lotus = "~/.config/lotus/rc.lotus",
+		nix = "~/.config/nixos/configuration.nix",
+		nvim = "~/.config/nvim/init.lua",
+		onedrive = "~/.config/onedrive/config",
+		vscodium = "~/.config/VSCodium/User/settings.json",
+		wezterm = "~/.config/wezterm/wezterm.lua",
+	}
+
+	local config = config_file[app]
+	if not config then
+		print(`No configuration file found for {app}`)
+		return 1
+	end
+
+	editor(config)
+end
+
+function cd(path) 
+	builtin.cd(path)
+	clear()
+	ls("-A1")
+end

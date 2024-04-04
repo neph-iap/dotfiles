@@ -75,6 +75,7 @@ in
   # Packages
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
+    bun
     discord
     duc
     firefox
@@ -117,9 +118,11 @@ in
     wget
   ];
 
+  # Program configuration
   programs.java.enable = true;
   programs.java.package = pkgs.jdk21;
 
+  # Fonts
   fonts.packages = with pkgs; [
     fira-code
   ];

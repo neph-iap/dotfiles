@@ -17,5 +17,7 @@ if [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ] ; then
 	read -p "Commit message: " commit_message
 	git commit -m "NixOS Update: $commit_message"
 	git push
+else
+	echo "Warning: dotfiles not managed by git"	
 fi
 popd

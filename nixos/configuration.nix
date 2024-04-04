@@ -135,11 +135,13 @@ in
   programs.java.package = pkgs.jdk21;
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
+    openssl
     xorg.libX11
     xorg.libXcursor
     xorg.libxcb
     xorg.libXi
     libxkbcommon
+    libz
   ];
 
   # Fonts

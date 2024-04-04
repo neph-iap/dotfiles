@@ -8,6 +8,7 @@
     "color-highlight.markRuler": false,
     "explorer.confirmDragAndDrop": false,
     "window.zoomLevel": 1,
+    "window.titleBarStyle": "custom",
     "files.eol": "\n",
     "files.exclude": {
         "**/*.meta": true

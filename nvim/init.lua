@@ -23,7 +23,6 @@ vim.opt.expandtab = false -- Dont replace tabs with spaces
 vim.opt.shiftwidth = 4 -- Use tabstop for automatic tabs
 vim.opt.showcmd = false -- Don't show keypressed
 vim.opt.termguicolors = true -- Use true color in the terminal
-vim.opt.scrolloff = 8 -- Keep 8 lines above and below the cursor when scrolling
 
 -- Image.nvim - requires magick luarocks
 package.path = package.path .. ";" .. vim.fn.expand("$HOME") .. "/.luarocks/share/lua/5.1/?/init.lua;"
@@ -44,6 +43,7 @@ local filetypes = {
 	["*.ll"] = "llvm",
 	["*.rasi"] = "rasi",
 	["*.pest"] = "pest",
+	["*.lotus"] = "lotus",
 	["*.lang2"] = "lang2",
 }
 
@@ -169,7 +169,7 @@ require("lazy").setup(
 						git_status = {
 							symbols = {
 								added = "+",
-								modified = "",
+								modified = "M",
 								untracked = "+",
 								deleted = "󰩹",
 								renamed = "R",
@@ -183,56 +183,52 @@ require("lazy").setup(
 				})
 
 				vim.api.nvim_set_hl(0, "NeoTreeGitUntracked", { fg = "#88FF88" })
+			end,
+			keys = {
+				{
+					"<leader>ef",
+					function()
+						-- Files that indicate the root directory
+						local root_files = {
+							".git",
+							"Cargo.toml",
+							"Makefile",
+							"package.json",
+							".luarc.json",
+							"pyproject.toml",
+							"build.zig",
+							"LICENSE",
+							"index.html",
+							"src",
+						}
 
-				local function open_neotree()
-					-- Files that indicate the root directory
-					local root_files = {
-						".git",
-						"Cargo.toml",
-						"Makefile",
-						"package.json",
-						".luarc.json",
-						"pyproject.toml",
-						"build.zig",
-						"LICENSE",
-						"index.html",
-						"src",
-					}
+						-- Check if the directory is the root directory
+						local function is_root_dir(dir_name)
+							for _, name in ipairs(root_files) do
+								if vim.fn.filereadable(dir_name .. "/" .. name) == 1 or vim.fn.isdirectory(dir_name .. "/" .. name) == 1 then
+									return true
+								end
+							end
+							return false
+						end
 
-					-- Check if the directory is the root directory
-					local function is_root_dir(dir_name)
-						for _, name in ipairs(root_files) do
-							if vim.fn.filereadable(dir_name .. "/" .. name) == 1 or vim.fn.isdirectory(dir_name .. "/" .. name) == 1 then
-								return true
+						-- Locate the project root directory
+						local current_directory = vim.fn.expand("%:p:h")
+						local root_directory = current_directory
+						while not is_root_dir(root_directory) do
+							root_directory = vim.fn.fnamemodify(root_directory, ":h")
+							if root_directory == "/" then
+								root_directory = current_directory
+								break
 							end
 						end
-						return false
-					end
 
-					-- Locate the project root directory
-					local current_directory = vim.fn.expand("%:p:h")
-					local root_directory = current_directory
-					while not is_root_dir(root_directory) do
-						root_directory = vim.fn.fnamemodify(root_directory, ":h")
-						if root_directory == "/" then
-							root_directory = current_directory
-							break
-						end
-					end
-
-					-- Open Neotree in the project root directory
-					vim.cmd("Neotree dir=" .. root_directory:gsub(" ", "\\ "))
-				end
-
-				vim.keymap.set("n", "<leader>ef", open_neotree, {})
-
-				vim.api.nvim_create_autocmd("VimEnter", {
-					callback = function()
-						open_neotree()
-						vim.cmd("wincmd p")
+						-- Open Neotree in the project root directory
+						vim.cmd("Neotree dir=" .. root_directory:gsub(" ", "\\ "))
 					end,
-				})
-			end,
+					desc = "Neotree",
+				},
+			},
 		},
 
 		-- Pretty bottom status bar
@@ -594,12 +590,11 @@ require("lazy").setup(
 		-- Live markdown preview
 		{
 			"iamcco/markdown-preview.nvim",
-			config = function()
+			build = function()
 				vim.schedule(function()
 					vim.fn["mkdp#util#install"]()
 				end)
 			end,
-			cmd = { "MarkdownPreview", "MarkdownPreviewToggle" },
 		},
 
 		-- Command line improvements and message tooltips
@@ -776,7 +771,7 @@ require("lazy").setup(
 
 		-- Language tool manager
 		{
-			dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/forge.nvim",
+			"neph-iap/forge.nvim",
 			dependencies = {
 				"nvim-treesitter/nvim-treesitter", -- Semantic highlighter
 				"williamboman/mason.nvim", -- LSP Installer
@@ -811,9 +806,18 @@ require("lazy").setup(
 			end,
 		},
 
+		-- Show startup time statistics
+		{
+			"dstein64/vim-startuptime",
+			cmd = "StartupTime",
+			config = function()
+				vim.g.startuptime_tries = 10
+			end,
+		},
+
 		-- Color picker
 		{
-			dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/easycolor.nvim",
+			"neph-iap/easycolor.nvim",
 			dependencies = { "stevearc/dressing.nvim" },
 			opts = {},
 			keys = { { "<leader>b", "<cmd>EasyColor<cr>", desc = "Easy Color" } },
@@ -825,7 +829,7 @@ require("lazy").setup(
 			main = "other-nvim",
 			opts = {
 				mappings = {
-					-- React + Sass Modules
+					-- Night Kitchen React
 					{
 						pattern = "(.*).js",
 						target = "%1.module.scss",
@@ -896,29 +900,25 @@ require("lazy").setup(
 		},
 
 		-- Lotus support
-		{
-			dir = "~/Documents/Coding/Developer Tools/lotus/lotus.nvim",
-			dependencies = {
-				"nvim-treesitter/nvim-treesitter",
-				"nvim-tree/nvim-web-devicons",
-			},
-			opts = {},
-		},
+		-- {
+		-- 	dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/lotus.nvim",
+		-- 	ft = "lotus",
+		-- },
 
 		-- Cargo
-		{
-			dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/cargo.nvim",
-			dependencies = {
-				{
-					"theHamsta/nvim_rocks",
-					build = "pipx install hererocks && hererocks . -j2.1.0-beta3 -r3.0.0 && cp nvim_rocks.lua lua",
-				},
-				"stevearc/dressing.nvim",
-			},
-			ft = { "rust", "toml" },
-			cmd = { "AddCrate" },
-			opts = {},
-		},
+		-- {
+		-- 	dir = "~/Documents/Coding/Developer Tools/Neovim Plugins/cargo.nvim",
+		-- 	dependencies = {
+		-- 		{
+		-- 			"theHamsta/nvim_rocks",
+		-- 			build = "pipx install hererocks && hererocks . -j2.1.0-beta3 -r3.0.0 && cp nvim_rocks.lua lua",
+		-- 		},
+		-- 		"stevearc/dressing.nvim",
+		-- 	},
+		-- 	ft = { "rust", "toml" },
+		-- 	cmd = { "AddCrate" },
+		-- 	opts = {},
+		-- },
 
 		{
 			"akinsho/bufferline.nvim",
@@ -1034,52 +1034,83 @@ require("lazy").setup(
 					},
 				})
 
-				-- Manual sorting wizardry - This enusres that the tabs are always sorted by most recently opened.
-				-- Every time a buffer is opened, it is automatically made the first tab, and the rest are shifted
-				-- to the right. Thus, the closest tabs are the most recently used.
-				vim.api.nvim_create_autocmd("BufEnter", {
-					callback = function(args)
-						local state = require("bufferline.state")
-						table.remove_value(buffers_opened, args.buf)
-						table.insert(buffers_opened, args.buf)
-						table.sort(state.components, function(a, b)
-							local a_index = buffers_opened:index_of(a.id)
-							local b_index = buffers_opened:index_of(b.id)
-							return a_index > b_index
-						end)
-						for index, buf in ipairs(state.components) do
-							buf.ordinal = index
-						end
-						state.custom_sort = require("bufferline.utils").get_ids(state.components)
-						require("bufferline.ui").refresh()
-					end,
-				})
-
-				-- vim.keymap.set("n", "<S-h>", ":BufferLineCyclePrev<CR>", {}) -- Move to next buffer
-				vim.keymap.set("n", "<S-h>", function()
-					vim.cmd("BufferLineCyclePrev")
-					vim.cmd("BufferLineCyclePrev")
-				end, {})
-				vim.keymap.set("n", "<S-l>", ":BufferLineCycleNext<CR>", {}) -- Move to previous buffer
+				-- -- Manual sorting wizardry - This enusres that the tabs are always sorted by most recently opened.
+				-- -- Every time a buffer is opened, it is automatically made the first tab, and the rest are shifted
+				-- -- to the right. Thus, the closest tabs are the most recently used.
+				-- vim.api.nvim_create_autocmd("BufEnter", {
+				-- 	callback = function(args)
+				-- 		local state = require("bufferline.state")
+				-- 		table.remove_value(buffers_opened, args.buf)
+				-- 		table.insert(buffers_opened, args.buf)
+				-- 		table.sort(state.components, function(a, b)
+				-- 			local a_index = buffers_opened:index_of(a.id)
+				-- 			local b_index = buffers_opened:index_of(b.id)
+				-- 			return a_index > b_index
+				-- 		end)
+				-- 		for index, buf in ipairs(state.components) do
+				-- 			buf.ordinal = index
+				-- 		end
+				-- 		state.custom_sort = require("bufferline.utils").get_ids(state.components)
+				-- 		require("bufferline.ui").refresh()
+				-- 	end,
+				-- })
+				--
+				-- -- vim.keymap.set("n", "<S-h>", ":BufferLineCyclePrev<CR>", {}) -- Move to next buffer
+				-- vim.keymap.set("n", "<S-h>", function()
+				-- 	vim.cmd("BufferLineCyclePrev")
+				-- 	vim.cmd("BufferLineCyclePrev")
+				-- end, {})
+				-- vim.keymap.set("n", "<S-l>", ":BufferLineCycleNext<CR>", {}) -- Move to previous buffer
 			end,
 			event = "VeryLazy", -- Required after NeoTreeNormal highlight group is loaded
 		},
 
-		-- Animations
-		--
-		-- ls("-A1") |> grep("/")
-		--
-		-- (function()
-		-- 		lotus.shell.input_pipe = true
-		-- 		local value = grep(ls("-A1"), "/")
-		-- 		lotus.shell.input_pipe = false
-		-- 		return value
-		-- end)()
-		--
 		{
-			"echasnovski/mini.animate",
-			opts = {},
+			"mfussenegger/nvim-lint",
+			config = function()
+				require("lint").linters.lang2 = {
+					name = "lang2",
+					cmd = "lang2",
+					args = {},
+					stdin = false,
+					stream = "both",
+					ignore_exitcode = false,
+					parser = function(output, bufnr)
+						local diagnostics = {}
+						for _, line in ipairs(vim.split(output, "\n")) do
+							local line_number, column, severity, message = line:match("^Error: (%d+):(%d+):(%w+):(.*)")
+							if line_number then
+								table.insert(diagnostics, {
+									bufnr = bufnr,
+									lnum = tonumber(line_number),
+									col = tonumber(column),
+									severity = vim.diagnostic.severity.ERROR,
+									message = message,
+								})
+							end
+						end
+						return diagnostics
+					end,
+				}
+
+				require("lint").linters_by_ft = {
+					lang2 = { "lang2" },
+				}
+
+				vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+					callback = function()
+						require("lint").try_lint()
+					end,
+				})
+			end,
 		},
+
+		{
+			"lambdalisue/suda.vim",
+			keys = {
+				{ "<leader>w", "<cmd>SudaWrite<cr>" }
+			}
+		}
 	},
 
 	-- Options for lazy.nvim

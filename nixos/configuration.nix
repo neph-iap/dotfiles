@@ -9,6 +9,9 @@ in
   # Hardware
   imports = [ ./hardware-configuration.nix ];
 
+  # NixOS
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   # Load unstable packages
   nixpkgs.config = {
     packageOverrides = pkgs: with pkgs; {
@@ -102,7 +105,7 @@ in
         redhat.java
         rust-lang.rust-analyzer
         serayuzgur.crates
-		svelte.svelte-vscode
+        svelte.svelte-vscode
         sumneko.lua
         tamasfe.even-better-toml
         usernamehw.errorlens
@@ -114,12 +117,12 @@ in
           version = "1.0.0";
           sha256 = "sha256-mx3hz2pRwL0cUDGnRy9eER/+SR7KXc8et2RcW//Ct6Q=";
         }
-		{
+        {
           name = "tauri-vscode";
           publisher = "tauri-apps";
           version = "0.2.6";
           sha256 = "sha256-O9NxFemUgt9XmhL6BnNArkqbCNtHguSbvVOYwlT0zg4=";
-		}
+        }
       ];
     })
     webkitgtk

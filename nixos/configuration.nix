@@ -148,4 +148,7 @@ in
   fonts.packages = with pkgs; [
     fira-code
   ];
+
+  virtualisation.virtualbox.host.enable = true;
+   users.extraGroups.vboxusers.members = [ "user-with-access-to-virtualbox" ];
 }

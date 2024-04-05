@@ -1,30 +1,49 @@
 -- Environment variables
-$PS1 = "> "
+$PS1 = "┣━ "
+$BUN_INSTALL = `{$HOME}/.bun`
+$MANPAGER = "nvim +Man!"
+$MANWIDTH = 999
+$TERM = "wezterm"
 
 -- Preference variables
 local editor = nvim
 
+-- Dotfile Configuration
 function cfg(app)
-	local config_file = {
-		lotus = "~/.config/lotus/rc.lotus",
-		nix = "~/.config/nixos/configuration.nix",
-		nvim = "~/.config/nvim/init.lua",
-		onedrive = "~/.config/onedrive/config",
-		vscodium = "~/.config/VSCodium/User/settings.json",
-		wezterm = "~/.config/wezterm/wezterm.lua",
+	local config_files = {
+		awesome = "/home/neph/.config/awesome/rc.lua",
+		bash = "/home/neph/.bashrc",
+		lotus = "/home/neph/.config/lotus/rc.lotus",
+		nvim = "/home/neph/.config/nvim/init.lua",
+		wezterm = "/home/neph/.config/wezterm/wezterm.lua",
 	}
 
-	local config = config_file[app]
-	if not config then
-		print(`No configuration file found for {app}`)
-		return 1
+	if config_files[app] then
+		editor(config_files[app])
+	else
+		print(`Unknown app: {app}`)
 	end
-
-	editor(config)
 end
 
-function cd(path) 
-	builtin.cd(path)
+-- Change Directory
+function cd(directory)
+	builtin.cd(directory)
+
+	local icons = require("web-devicons")
+
 	clear()
-	ls("-A1")
+	print(`┏━ {$PWD}:`)
+
+	local files = $(ls("-pv") |> grep("-v", "/")) |> lotus.string.lines() |> ipairs()
+	local directories = $(ls("-pv") |> grep("/")) |> lotus.string.lines() |> ipairs()
+
+	for _, directory in directories do
+		print(`┃  {directory}`)
+	end
+
+	for _, file in files do
+		local extension = file:match(".*%.(.+)") or ""
+		local icon = icons.get_icon(file, extension, { default = true, strict = true })
+		print(`┃ {icon} {file}`)
+	end
 end
